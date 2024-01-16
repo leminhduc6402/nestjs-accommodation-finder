@@ -6,14 +6,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import aqp from 'api-query-params';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(UserModel.name)
-    private userModel: Model<User>,
+    private userModel: SoftDeleteModel<UserDocument>,
+
     private configService: ConfigService,
-    // private userModel: SoftDeleteModel<UserDocument>,
   ) {}
   hashPassword = (password: string) => {
     const salt = genSaltSync(10);
@@ -24,11 +26,64 @@ export class UsersService {
     return compareSync(password, hash);
   }
 
+  async findAll(currentPage: number, limit: number, qs: string) {
+    const { filter, sort, population } = aqp(qs);
+    delete filter.current;
+    delete filter.pageSize;
+
+    let offset = (+currentPage - 1) * +limit;
+    let defaultLimit = +limit ? +limit : 10;
+    const totalItems = (await this.userModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / defaultLimit);
+
+    // const searchConditions = {};
+    // const { current, pageSize, ...queryString }: any = qs;
+
+    // Object.keys(queryString).forEach((field) => {
+    //   searchConditions[field] = { $regex: new RegExp(queryString[field], 'i') };
+    // });
+    // const users = await this.userModel.find(searchConditions);
+
+    const results = await this.userModel
+      .find(filter)
+      .select('-password')
+      .skip(offset)
+      .limit(defaultLimit)
+      .sort(sort as any)
+      .populate(population)
+      .exec();
+
+    return {
+      meta: {
+        current: currentPage, //trang hiện tại
+        pageSize: limit, //số lượng bản ghi đã lấy
+        pages: totalPages, //tổng số trang với điều kiện query
+        total: totalItems, // tổng số phần tử (số bản ghi)
+      },
+      results, //kết quả query
+    };
+  }
+
   async create(createUserDto: CreateUserDto) {
-    const { fullName, email, password, avatar, phone, role, address } =
-      createUserDto;
-    const isExist = await this.userModel.find({ email });
-    if (!isExist) {
+    const {
+      fullName,
+      email,
+      password,
+      avatar,
+      phone,
+      role,
+      streetAddress,
+      latitude,
+      longitude,
+      provinceCode,
+      districtCode,
+      wardCode,
+      provinceName,
+      districtName,
+      wardName,
+    } = createUserDto;
+    const isExist = await this.userModel.findOne({ email });
+    if (isExist) {
       throw new BadRequestException(`Email: ${email} already exists`);
     }
 
@@ -43,13 +98,19 @@ export class UsersService {
       isActive: true,
       phone,
       role,
-      address,
+      address: {
+        streetAddress,
+        latitude,
+        longitude,
+        provinceCode,
+        districtCode,
+        wardCode,
+        provinceName,
+        districtName,
+        wardName,
+      },
     });
     return user;
-  }
-
-  findAll() {
-    return `This action returns all users`;
   }
 
   async findOne(id: string) {
@@ -58,6 +119,13 @@ export class UsersService {
     }
     const user = this.userModel.findOne({ _id: id }).select('-password');
     return user;
+  }
+
+  async findOneByUsername(username: string) {
+    return this.userModel.findOne({
+      email: username,
+    });
+    // .populate({ path: 'role', select: { name: 1 } });
   }
 
   async update(updateUserDto: UpdateUserDto) {
@@ -71,7 +139,7 @@ export class UsersService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return 'Can not found this user';
     }
-    return this.userModel.deleteOne({ _id: id });
+    return this.userModel.softDelete({ _id: id });
 
     // if (!mongoose.Types.ObjectId.isValid(id)) {
     //   return 'not found user';
