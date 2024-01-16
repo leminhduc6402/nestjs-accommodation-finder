@@ -15,7 +15,7 @@ export class User {
   password: string;
 
   @Prop()
-  avatar: string
+  avatar: string;
 
   @Prop()
   phone: string;
@@ -24,10 +24,20 @@ export class User {
   role: string;
 
   @Prop()
-  isActive: boolean  
-  
-  @Prop()
-  address: boolean
+  isActive: boolean;
+
+  @Prop({ type: Object })
+  address: {
+    streetAddress: string;
+    latitude: number;
+    longitude: number;
+    provinceCode: number;
+    districtCode: number;
+    wardCode: number;
+    provinceName: string;
+    districtName: string;
+    wardName: string;
+  };
 
   @Prop()
   createdAt: Date;
@@ -36,10 +46,19 @@ export class User {
   updatedAt: Date;
 
   @Prop()
-  createdBy: mongoose.Schema.Types.ObjectId
+  createdBy: mongoose.Schema.Types.ObjectId;
 
   @Prop()
-  updatedBy: mongoose.Schema.Types.ObjectId
+  updatedBy: mongoose.Schema.Types.ObjectId;
+
+  @Prop()
+  deletedBy: mongoose.Schema.Types.ObjectId;
+
+  @Prop()
+  isDelete: boolean;
+
+  @Prop()
+  deletedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
