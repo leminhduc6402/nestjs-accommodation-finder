@@ -12,7 +12,8 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { Public, ResponseMessage } from 'src/customDecorator/customize';
+import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
+import { IUser } from './users.interface';
 
 @ApiTags('Users')
 @Controller('users')
@@ -21,7 +22,7 @@ export class UsersController {
 
   @Post()
   @ResponseMessage('Create a new user')
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto, @User() user: IUser) {
     return this.usersService.create(createUserDto);
   }
 

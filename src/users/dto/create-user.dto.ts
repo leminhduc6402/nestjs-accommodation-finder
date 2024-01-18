@@ -8,35 +8,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-// export class Address {
-//   @IsNotEmpty()
-//   streetAddress: string;
-
-//   @IsNotEmpty()
-//   latitude: number;
-
-//   @IsNotEmpty()
-//   longitude: number;
-
-//   @IsNotEmpty()
-//   provinceCode: number;
-
-//   @IsNotEmpty()
-//   districtCode: number;
-
-//   @IsNotEmpty()
-//   wardCode: number;
-
-//   @IsNotEmpty()
-//   provinceName: string;
-
-//   @IsNotEmpty()
-//   districtName: string;
-
-//   @IsNotEmpty()
-//   wardName: string;
-// }
-
 export class CreateUserDto {
   @IsNotEmpty()
   fullName: string;
