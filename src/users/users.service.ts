@@ -95,7 +95,7 @@ export class UsersService {
       email,
       password: hashPassword,
       avatar: avatar || default_avatar,
-      isActive: true,
+      active: true,
       phone,
       role,
       address: {

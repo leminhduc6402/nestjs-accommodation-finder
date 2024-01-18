@@ -24,7 +24,7 @@ export class User {
   role: string;
 
   @Prop()
-  isActive: boolean;
+  active: boolean;
 
   @Prop({ type: Object })
   address: {
