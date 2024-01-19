@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsArray } from 'class-validator';
 import mongoose, { Date, HydratedDocument } from 'mongoose';
+import { User } from 'src/users/schemas/user.schema';
 
 export type ArticleDocument = HydratedDocument<Article>;
 
@@ -13,7 +14,8 @@ export class Article {
   description: string;
 
   @Prop({ required: true })
-  categoryId: mongoose.Schema.Types.ObjectId;
+  // categoryId: mongoose.Schema.Types.ObjectId;
+  categoryId: string
 
   @Prop({ required: true })
   price: number;
@@ -24,7 +26,7 @@ export class Article {
   @Prop()
   status: string;
 
-  @Prop({ required: true })
+  @Prop()
   active: boolean;
 
   @Prop({ type: Object })
@@ -55,19 +57,19 @@ export class Article {
   @Prop({ type: Date })
   createdAt: Date;
 
-  @Prop()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
   createdBy: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: Date })
   updatedAt: Date;
 
-  @Prop()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
   updatedBy: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: Date })
   deletedAt: Date;
 
-  @Prop()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
   deletedBy: mongoose.Schema.Types.ObjectId;
 
   @Prop()

@@ -3,7 +3,8 @@ import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Public } from 'src/customDecorator/customize';
 import { LocalAuthGuard } from './local-auth.guard';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -18,8 +19,9 @@ export class AuthController {
     @Request() req: any,
     // @Res({ passthrough: true }) response: Response,
   ) {
-    return this.authService.login(req.user
+    return this.authService.login(
+      req.user,
       // , response
-      );
+    );
   }
 }
