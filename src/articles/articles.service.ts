@@ -84,7 +84,7 @@ export class ArticlesService {
     }
     return await this.articleModel.findById(id).populate({
       path: 'createdBy',
-      select: 'fullName email phone'
+      select: 'fullName email phone avatar'
     });
   }
 

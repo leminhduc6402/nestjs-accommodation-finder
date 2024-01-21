@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { User as UserModel, UserDocument, User } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,6 +8,7 @@ import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
+import { IUser } from './users.interface';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +27,40 @@ export class UsersService {
     return compareSync(password, hash);
   }
 
+  updateUserToken = async (refreshToken: string, _id: string) => {
+    return await this.userModel.updateOne({ _id }, { refreshToken });
+  };
+
+  async register(user: RegisterUserDto) {
+    const { fullName, email, password } = user;
+
+    //check email
+    const isExist = await this.userModel.findOne({ email });
+    if (isExist) {
+      throw new BadRequestException(`Email: ${email} already exists`);
+    }
+
+    // const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+
+    const hashPassword = this.hashPassword(password);
+
+    let newRegister = await this.userModel.create({
+      fullName,
+      email,
+      password: hashPassword,
+      // role: userRole._id,
+      role: 'USER',
+    });
+    return newRegister;
+  }
+
+  findUserByToken = async (refreshToken: string) => {
+    return await this.userModel
+      .findOne({ refreshToken })
+      .populate({ path: 'role', select: { name: 1 } });
+  };
+
+  // CRUD user
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population } = aqp(qs);
     delete filter.current;
@@ -35,14 +70,6 @@ export class UsersService {
     let defaultLimit = +limit ? +limit : 10;
     const totalItems = (await this.userModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
-
-    // const searchConditions = {};
-    // const { current, pageSize, ...queryString }: any = qs;
-
-    // Object.keys(queryString).forEach((field) => {
-    //   searchConditions[field] = { $regex: new RegExp(queryString[field], 'i') };
-    // });
-    // const users = await this.userModel.find(searchConditions);
 
     const results = await this.userModel
       .find(filter)
@@ -82,6 +109,7 @@ export class UsersService {
       districtName,
       wardName,
     } = createUserDto;
+
     const isExist = await this.userModel.findOne({ email });
     if (isExist) {
       throw new BadRequestException(`Email: ${email} already exists`);
@@ -128,37 +156,34 @@ export class UsersService {
     // .populate({ path: 'role', select: { name: 1 } });
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  async update(updateUserDto: UpdateUserDto, user: IUser) {
     return await this.userModel.updateOne(
       { _id: updateUserDto._id },
-      { ...updateUserDto },
+      {
+        ...updateUserDto,
+        updatedBy: user._id,
+      },
     );
   }
 
-  remove(id: string) {
+  async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return 'Can not found this user';
+      return 'not found user';
     }
-    return this.userModel.softDelete({ _id: id });
+    const foundUser = await this.userModel.findById(id);
+    if (foundUser && foundUser.email === 'leminhduc6402@gmail.com')
+      throw new BadRequestException('Không thể xoá tài khoản này');
 
-    // if (!mongoose.Types.ObjectId.isValid(id)) {
-    //   return 'not found user';
-    // }
-    // const foundUser = await this.userModel.findById(id);
-    // if (foundUser && foundUser.email === 'leminhduc6402@gmail.com')
-    //   throw new BadRequestException('Không thể xoá tài khoản này');
-
-    // await this.userModel.updateOne(
-    //   { _id: id },
-    //   {
-    //     deletedBy: {
-    //       _id: user._id,
-    //       email: user.email,
-    //     },
-    //   },
-    // );
-    // return this.userModel.softDelete({
-    //   _id: id,
-    // });
+    await this.userModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: user._id,
+      },
+    );
+    return this.userModel.softDelete({
+      _id: id,
+    });
   }
+
+
 }
