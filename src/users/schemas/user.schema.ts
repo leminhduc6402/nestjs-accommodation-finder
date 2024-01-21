@@ -40,6 +40,9 @@ export class User {
   };
 
   @Prop()
+  refreshToken: string
+
+  @Prop()
   createdAt: Date;
 
   @Prop()
