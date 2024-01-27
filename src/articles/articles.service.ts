@@ -48,6 +48,47 @@ export class ArticlesService {
     return article;
   }
 
+  // async findAll(currentPage: number, limit: number, qs: string) {
+  //   const { filter, sort, population, projection } = aqp(qs);
+  //   delete filter.current;
+  //   delete filter.pageSize;
+
+  //   let offset = (+currentPage - 1) * +limit;
+  //   let defaultLimit = +limit ? +limit : 10;
+
+  //   // Lấy số lượng bản ghi đã soft-delete
+  //   const totalDeletedItems = (await this.articleModel.findDeleted()).length;
+
+  //   // Lấy số lượng bản ghi chưa soft-delete
+  //   const totalUndeletedItems = (await this.articleModel.find(filter)).length;
+
+  //   const totalItems = totalDeletedItems + totalUndeletedItems;
+  //   const totalPages = Math.ceil(totalItems / defaultLimit);
+
+  //   // Lấy tất cả các bản ghi chưa soft-delete và thêm vào kết quả bản ghi đã soft-delete
+  //   const results = await Promise.all([
+  //     this.articleModel
+  //       .find(filter)
+  //       .skip(offset)
+  //       .limit(defaultLimit)
+  //       .sort(sort as any)
+  //       .select(projection)
+  //       .populate(population)
+  //       .exec(),
+  //     this.articleModel.findDeleted(),
+  //   ]);
+
+  //   return {
+  //     meta: {
+  //       current: currentPage, //trang hiện tại
+  //       pageSize: limit, //số lượng bản ghi đã lấy
+  //       pages: totalPages, //tổng số trang với điều kiện query
+  //       total: totalItems, // tổng số phần tử (số bản ghi)
+  //     },
+  //     results: results.flat(), // kết quả query, nối kết quả đã soft-delete vào kết quả chưa soft-delete
+  //   };
+  // }
+
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population, projection } = aqp(qs);
     delete filter.current;
@@ -84,7 +125,7 @@ export class ArticlesService {
     }
     return await this.articleModel.findById(id).populate({
       path: 'createdBy',
-      select: 'fullName email phone avatar'
+      select: 'fullName email phone avatar',
     });
   }
 
