@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
+import {
+  CreateUserDto,
+  RegisterUserDto,
+} from './dto/create-user.dto';
 import { User as UserModel, UserDocument, User } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -149,9 +152,9 @@ export class UsersService {
     return user;
   }
 
-  async findOneByUsername(username: string) {
+  async findOneByEmail(email: string) {
     return this.userModel.findOne({
-      email: username,
+      email,
     });
     // .populate({ path: 'role', select: { name: 1 } });
   }
@@ -172,7 +175,9 @@ export class UsersService {
     }
     const foundUser = await this.userModel.findById(id);
     if (foundUser && foundUser.email === 'leminhduc6402@gmail.com')
-      throw new BadRequestException('Không thể xoá tài khoản này');
+      throw new BadRequestException(
+        'You do not have enough permission to remove this account',
+      );
 
     await this.userModel.updateOne(
       { _id: id },
@@ -184,6 +189,4 @@ export class UsersService {
       _id: id,
     });
   }
-
-
 }

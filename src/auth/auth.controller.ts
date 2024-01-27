@@ -10,7 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { LocalAuthGuard } from './local-auth.guard';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto, UserLoginDto } from 'src/users/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { IUser } from 'src/users/users.interface';
@@ -25,6 +25,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: UserLoginDto })
+  @ApiOperation({ summary: 'Login' })
   @Post('/login')
   @ResponseMessage('User login')
   async handleLogin(
@@ -35,12 +36,14 @@ export class AuthController {
   }
 
   @Public()
+  @ApiOperation({ summary: 'Resgister a new user' })
   @ResponseMessage('Resgister a new user')
   @Post('/register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return this.authService.register(registerUserDto);
   }
 
+  @ApiOperation({ summary: 'Get user information when logged in' })
   @ResponseMessage('Get user information')
   @Get('/account')
   handleGetAccount(@User() user: IUser) {
@@ -48,6 +51,7 @@ export class AuthController {
   }
 
   @Public()
+  @ApiOperation({ summary: 'Get user by refresh token' })
   @ResponseMessage('Get user by refresh token')
   @Get('/refresh')
   handleRefreshAccount(
@@ -58,6 +62,7 @@ export class AuthController {
     return this.authService.processNewToken(refreshToken, response);
   }
 
+  @ApiOperation({ summary: 'Logout user' })
   @ResponseMessage('Logout user')
   @Post('/logout')
   handleLogout(

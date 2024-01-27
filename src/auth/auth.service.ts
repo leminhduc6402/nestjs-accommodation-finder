@@ -15,8 +15,9 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOneByUsername(username);
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOneByEmail(email);
+
     if (user) {
       const isValid = this.usersService.isValidPassword(pass, user.password);
       if (isValid === true) {
@@ -54,9 +55,9 @@ export class AuthService {
       sameSite: 'none',
       secure: true,
     });
+    response.status(200);
     return {
       access_token: this.jwtService.sign(payload),
-      refresh_token,
       // refresh_token,
       user: {
         _id,
@@ -121,7 +122,7 @@ export class AuthService {
 
         return {
           access_token: this.jwtService.sign(payload),
-          refresh_token,
+          // refresh_token,
           user: {
             _id,
             fullName,
