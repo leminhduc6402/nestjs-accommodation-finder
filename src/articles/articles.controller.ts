@@ -15,7 +15,6 @@ import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IUser } from 'src/users/users.interface';
 @ApiTags('Articles')
-@Public()
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}

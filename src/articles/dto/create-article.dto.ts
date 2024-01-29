@@ -45,7 +45,7 @@ export class CreateArticleDto {
   @IsNotEmpty()
   wardName: string;
 
-  // @IsNotEmpty()
-  // @IsArray()
-  // images: string[];
+  @IsNotEmpty()
+  @IsArray()
+  images: string[];
 }
