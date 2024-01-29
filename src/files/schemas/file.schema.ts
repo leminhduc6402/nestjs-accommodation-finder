@@ -11,9 +11,6 @@ export class File {
   name: string;
 
   @Prop()
-  fileName: string;
-
-  @Prop()
   mimeType: string;
 
   @Prop()
@@ -21,6 +18,9 @@ export class File {
 
   @Prop()
   key: string;
+
+  @Prop()
+  path: string;
 
   @Prop({ type: Date })
   createdAt: Date;
