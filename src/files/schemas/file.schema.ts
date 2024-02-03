@@ -17,9 +17,6 @@ export class File {
   size: number;
 
   @Prop()
-  key: string;
-
-  @Prop()
   path: string;
 
   @Prop({ type: Date })
@@ -34,11 +31,11 @@ export class File {
   //   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
   //   updatedBy: mongoose.Schema.Types.ObjectId;
 
-  //   @Prop({ type: Date })
-  //   deletedAt: Date;
+    @Prop({ type: Date })
+    deletedAt: Date;
 
-  //   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-  //   deletedBy: mongoose.Schema.Types.ObjectId;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+    deletedBy: mongoose.Schema.Types.ObjectId;
 
   //   @Prop()
   //   isDelete: boolean;

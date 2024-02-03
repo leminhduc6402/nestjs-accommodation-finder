@@ -1,19 +1,14 @@
 import {
   Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
   Delete,
-  UseInterceptors,
+  Param,
+  Post,
   UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { FilesService } from './files.service';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
-import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
+import { FilesService } from './files.service';
 import { IUser } from 'src/users/users.interface';
 
 @Controller('files')
@@ -57,8 +52,9 @@ export class FilesController {
   //   return this.filesService.update(+id, updateFileDto);
   // }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.filesService.remove(+id);
-  // }
+  @ResponseMessage('Delete a file')
+  @Delete(':name')
+  remove(@Param('name') name: string, @User() user: IUser) {
+    return this.filesService.remove(name, user);
+  }
 }

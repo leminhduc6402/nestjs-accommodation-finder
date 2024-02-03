@@ -1,83 +1,104 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { File, FileDocument } from './schemas/file.schema';
-import { ConfigService } from '@nestjs/config';
 import {
-  ObjectCannedACL,
+  DeleteObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { S3 } from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
-import { User } from 'src/customDecorator/customize';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
+import { v4 as uuidv4 } from 'uuid';
+import { File, FileDocument } from './schemas/file.schema';
 
 @Injectable()
 export class FilesService {
-  // constructor(
-  // @InjectModel(File.name)
-  // private fileModel: SoftDeleteModel<FileDocument>,
-  //   private configService: ConfigService,
-  // ) {}
-
-  private readonly s3Client: S3Client;
-
   constructor(
     @InjectModel(File.name)
     private fileModel: SoftDeleteModel<FileDocument>,
     private configService: ConfigService,
-  ) {
-    this.s3Client = new S3Client({
-      region: this.configService.get<string>('AWS_REGION'),
-      credentials: {
-        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
-        secretAccessKey: this.configService.get<string>(
-          'AWS_SECRET_ACCESS_KEY',
-        ),
-      },
-    });
-  }
+  ) {}
+  private readonly s3Client = new S3Client({
+    region: this.configService.get<string>('AWS_REGION'),
+    credentials: {
+      accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
+      secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY'),
+    },
+  });
 
-  private getS3() {
-    return new S3({
-      region: this.configService.get<string>('AWS_REGION'),
-      credentials: {
-        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
-        secretAccessKey: this.configService.get<string>(
-          'AWS_SECRET_ACCESS_KEY',
-        ),
-      },
-    });
-  }
-
-  async upload(file: Express.Multer.File, @User() user: IUser) {
-    const s3 = this.getS3();
-
-    const uploadResult = await s3
-      .upload({
+  async upload(file: Express.Multer.File, user: IUser) {
+    const key = `${uuidv4()}-${file.originalname}`;
+    const result = await this.s3Client.send(
+      new PutObjectCommand({
         Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Key: key,
         Body: file.buffer,
-        Key: `${uuidv4()}-${file.originalname}`,
-        ACL: 'public-read' as ObjectCannedACL,
-      })
-      .promise();
-    if (!uploadResult) {
-      throw new BadRequestException('Something wrong when upload file');
+        ACL: 'public-read',
+        ContentType: file.mimetype,
+      }),
+    );
+    if (result.$metadata.httpStatusCode !== 200) {
+      throw new BadRequestException('Something wrong when upload file!!!');
     }
-    const result = await this.fileModel.create({
-      name: uploadResult.Key,
+
+    const fileInfo = await this.fileModel.create({
+      name: key,
       mimeType: file.mimetype,
       size: file.size,
-      key: uploadResult.Key,
-      path: uploadResult.Location,
+      path: `https://${this.configService.get(
+        'AWS_PUBLIC_BUCKET_NAME',
+      )}.s3.amazonaws.com/${key}`,
       createdBy: user._id,
     });
-    return { path: result.path };
+    return { path: fileInfo.path };
+  }
+
+  async remove(key: string, user: IUser) {
+    if (!this.fileModel.findOne({ name: key }))
+      throw new NotFoundException('Cannot found this file');
+
+    const result = await this.s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Key: key,
+      }),
+    );
+
+    if (result.$metadata.httpStatusCode === 204) {
+      this.fileModel.updateOne(
+        { name: key },
+        {
+          deletedBy: user._id,
+        },
+      );
+    }
+    return this.fileModel.softDelete({ name: key });
   }
 }
+// private getS3() {
+//   return new S3({
+//     region: this.configService.get<string>('AWS_REGION'),
+//     credentials: {
+//       accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
+//       secretAccessKey: this.configService.get<string>(
+//         'AWS_SECRET_ACCESS_KEY',
+//       ),
+//     },
+//   });
+// }
+
+// async remove(key: string) {
+//   const s3 = this.getS3();
+//   const result = await s3.deleteObject({
+//     Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+//     Key: key,
+//   });
+//   return result;
+// }
 
 // findAll() {
 //   return `This action returns all files`;
@@ -93,4 +114,28 @@ export class FilesService {
 
 // remove(id: number) {
 //   return `This action removes a #${id} file`;
+// }
+
+// async upload(file: Express.Multer.File, @User() user: IUser) {
+//   const s3 = this.getS3();
+//   const uploadResult = await s3
+//     .upload({
+//       Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+//       Body: file.buffer,
+//       Key: `${uuidv4()}-${file.originalname}`,
+//       ACL: 'public-read' as ObjectCannedACL,
+//     })
+//     .promise();
+//   if (!uploadResult) {
+//     throw new BadRequestException('Something wrong when upload file');
+//   }
+//   const result = await this.fileModel.create({
+//     name: uploadResult.Key,
+//     mimeType: file.mimetype,
+//     size: file.size,
+//     key: uploadResult.Key,
+//     path: uploadResult.Location,
+//     createdBy: user._id,
+//   });
+//   return { path: result.path };
 // }
