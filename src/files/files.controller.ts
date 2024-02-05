@@ -1,8 +1,10 @@
 import {
   Controller,
   Delete,
+  Get,
   Param,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -10,14 +12,35 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { FilesService } from './files.service';
 import { IUser } from 'src/users/users.interface';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('files')
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @Post('upload/single')
+  @ApiOperation({ summary: 'Upload single file' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @ResponseMessage('Upload single file')
-  @UseInterceptors(FileInterceptor('fileUpload'))
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
   async uploadSingleFile(
     @UploadedFile() file: Express.Multer.File,
     @User() user: IUser,
@@ -25,22 +48,17 @@ export class FilesController {
     return await this.filesService.upload(file, user);
   }
 
-  // @Public()
-  // @Post('upload/multiple')
-  // @ResponseMessage('Upload single file')
-  // @UseInterceptors(FileInterceptor('fileUpload'))
-  // async uploadMultipleFiles(@UploadedFile() file: Express.Multer.File
-  // // , @User() user: IUser
-  // ) {
-  //   return await this.filesService.create(file
-  //     // , user
-  //     );
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.filesService.findAll();
-  // }
+  @Public()
+  @ApiOperation({ summary: 'Get all article with pagination' })
+  @ResponseMessage('fetch article with pagination')
+  @Get()
+  findAll(
+    @Query('current') currentPage: string,
+    @Query('pageSize') limit: string,
+    @Query() qs: string,
+  ) {
+    return this.filesService.findAll(+currentPage, +limit, qs);
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {
@@ -52,6 +70,7 @@ export class FilesController {
   //   return this.filesService.update(+id, updateFileDto);
   // }
 
+  @ApiOperation({ summary: 'Delete a file' })
   @ResponseMessage('Delete a file')
   @Delete(':name')
   remove(@Param('name') name: string, @User() user: IUser) {
