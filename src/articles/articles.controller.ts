@@ -39,7 +39,7 @@ export class ArticlesController {
   }
 
   @ApiOperation({ summary: 'Get an article by id' })
-  @ResponseMessage("Get an article")
+  @ResponseMessage("Get an article by id")
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.articlesService.findOne(id);

@@ -121,7 +121,7 @@ export class ArticlesService {
 
   async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('not found article with id');
+      throw new BadRequestException('Not found article with id');
     }
     return await this.articleModel.findById(id).populate({
       path: 'createdBy',
