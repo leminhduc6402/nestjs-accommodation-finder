@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsArray } from 'class-validator';
 import mongoose, { Date, HydratedDocument } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
 
@@ -10,8 +9,8 @@ export class Category {
   @Prop()
   name: string;
 
-//   @Prop()
-//   active: boolean;
+  @Prop()
+  active: boolean;
 
   @Prop({ type: Date })
   createdAt: Date;
