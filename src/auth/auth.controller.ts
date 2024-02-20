@@ -40,7 +40,7 @@ export class AuthController {
   @ResponseMessage('Resgister a new user')
   @Post('/register')
   async register(@Body() registerUserDto: RegisterUserDto) {
-    return this.authService.register(registerUserDto);
+    return await this.authService.register(registerUserDto);
   }
 
   @ApiOperation({ summary: 'Get user information when logged in' })

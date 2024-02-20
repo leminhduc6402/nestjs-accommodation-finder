@@ -36,7 +36,7 @@ export class UsersService {
 
   async register(user: RegisterUserDto) {
     const { fullName, email, password } = user;
-
+    const default_avatar = this.configService.get<string>('DEFAULT_IMAGE');
     //check email
     const isExist = await this.userModel.findOne({ email });
     if (isExist) {
@@ -51,6 +51,7 @@ export class UsersService {
       fullName,
       email,
       password: hashPassword,
+      avatar: default_avatar,
       // role: userRole._id,
       role: 'USER',
     });
