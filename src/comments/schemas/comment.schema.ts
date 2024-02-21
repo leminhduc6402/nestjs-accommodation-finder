@@ -16,17 +16,10 @@ export class Comment {
 
   @Prop({ type: mongoose.Schema.Types.Array })
   replies: {
-    // _id: mongoose.Schema.Types.ObjectId
+    _id: string;
     content: string;
-    createdAt: Date;
-    createdBy: {
-      _id: mongoose.Schema.Types.ObjectId;
-      email: string;
-      fullName: string;
-      avatar: string;
-    };
-    updateAt: Date;
-    updateBy: {
+    updatedAt: Date;
+    updatedBy: {
       _id: mongoose.Schema.Types.ObjectId;
       email: string;
       fullName: string;

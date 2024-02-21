@@ -8,8 +8,8 @@ export class CreateCommentDto {
   articleId: string;
 }
 export class CreateReplyDto {
-  @IsNotEmpty()
-  replyId: string;
+  // @IsNotEmpty()
+  // commentId: string;
 
   @IsNotEmpty()
   content: string;

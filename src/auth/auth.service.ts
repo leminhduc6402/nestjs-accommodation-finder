@@ -32,6 +32,7 @@ export class AuthService {
       _id,
       email,
       fullName,
+      avatar,
       role,
       // , permissions
     } = user;
@@ -41,6 +42,7 @@ export class AuthService {
       _id,
       fullName,
       email,
+      avatar,
       role,
     };
     const refresh_token = this.createRefreshToken(payload);
