@@ -38,8 +38,9 @@ export class ArticlesController {
     return this.articlesService.findAll(+currentPage, +limit, qs);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get an article by id' })
-  @ResponseMessage("Get an article by id")
+  @ResponseMessage('Get an article by id')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.articlesService.findOne(id);
@@ -61,5 +62,13 @@ export class ArticlesController {
   @Delete(':id')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.articlesService.remove(id, user);
+  }
+
+  @Public()
+  @ApiOperation({ summary: 'Get an article by id' })
+  @ResponseMessage('Get an article by id')
+  @Get('search-by-location')
+  findByLocation(@Query('longitude') longitude: string, @Query('latitude') latitude: string) {
+    return this.articlesService.findByLocation(+longitude, +latitude);
   }
 }

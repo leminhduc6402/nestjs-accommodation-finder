@@ -8,6 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { IUser } from 'src/users/users.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
+import { CommentsService } from 'src/comments/comments.service';
+import path from 'path';
 
 @Injectable()
 export class ArticlesService {
@@ -15,9 +17,11 @@ export class ArticlesService {
     @InjectModel(Article.name)
     private articleModel: SoftDeleteModel<ArticleDocument>,
     private configService: ConfigService,
+    private commentService: CommentsService,
   ) {}
 
   async create(createArticleDto: CreateArticleDto, user: IUser) {
+    await this.articleModel.createIndexes();
     const {
       streetAddress,
       latitude,
@@ -33,8 +37,6 @@ export class ArticlesService {
       ...createArticleDto,
       address: {
         streetAddress,
-        latitude,
-        longitude,
         provinceCode,
         districtCode,
         wardCode,
@@ -42,52 +44,15 @@ export class ArticlesService {
         districtName,
         wardName,
       },
+      location: {
+        coordinates: [longitude, latitude],
+        type: 'Point',
+      },
       createdBy: user._id,
     });
 
     return article;
   }
-
-  // async findAll(currentPage: number, limit: number, qs: string) {
-  //   const { filter, sort, population, projection } = aqp(qs);
-  //   delete filter.current;
-  //   delete filter.pageSize;
-
-  //   let offset = (+currentPage - 1) * +limit;
-  //   let defaultLimit = +limit ? +limit : 10;
-
-  //   // Lấy số lượng bản ghi đã soft-delete
-  //   const totalDeletedItems = (await this.articleModel.findDeleted()).length;
-
-  //   // Lấy số lượng bản ghi chưa soft-delete
-  //   const totalUndeletedItems = (await this.articleModel.find(filter)).length;
-
-  //   const totalItems = totalDeletedItems + totalUndeletedItems;
-  //   const totalPages = Math.ceil(totalItems / defaultLimit);
-
-  //   // Lấy tất cả các bản ghi chưa soft-delete và thêm vào kết quả bản ghi đã soft-delete
-  //   const results = await Promise.all([
-  //     this.articleModel
-  //       .find(filter)
-  //       .skip(offset)
-  //       .limit(defaultLimit)
-  //       .sort(sort as any)
-  //       .select(projection)
-  //       .populate(population)
-  //       .exec(),
-  //     this.articleModel.findDeleted(),
-  //   ]);
-
-  //   return {
-  //     meta: {
-  //       current: currentPage, //trang hiện tại
-  //       pageSize: limit, //số lượng bản ghi đã lấy
-  //       pages: totalPages, //tổng số trang với điều kiện query
-  //       total: totalItems, // tổng số phần tử (số bản ghi)
-  //     },
-  //     results: results.flat(), // kết quả query, nối kết quả đã soft-delete vào kết quả chưa soft-delete
-  //   };
-  // }
 
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population, projection } = aqp(qs);
@@ -123,10 +88,14 @@ export class ArticlesService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Not found article with id');
     }
-    return await this.articleModel.findById(id).populate({
+    const article = await this.articleModel.findById(id).populate({
       path: 'createdBy',
       select: 'fullName email phone avatar',
     });
+    const comments = await this.commentService.findAllByArticleId(
+      article._id.toString(),
+    );
+    return { article, comments };
   }
 
   update(_id: string, updateArticleDto: UpdateArticleDto, user: IUser) {
@@ -155,5 +124,20 @@ export class ArticlesService {
       },
     );
     return this.articleModel.softDelete({ _id: id });
+  }
+
+  async findByLocation(longitude: number, latitude: number) {
+    const articles = await this.articleModel.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [longitude, latitude],
+          },
+          $maxDistance: 3000, // 3km
+        },
+      },
+    });
+    return articles;
   }
 }

@@ -14,5 +14,6 @@ import { Article, ArticleSchema } from 'src/articles/schemas/article.schema';
   ],
   controllers: [CommentsController],
   providers: [CommentsService],
+  exports: [CommentsService]
 })
 export class CommentsModule {}

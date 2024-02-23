@@ -15,7 +15,7 @@ export class Article {
 
   @Prop({ required: true })
   // categoryId: mongoose.Schema.Types.ObjectId;
-  categoryId: string
+  categoryId: string;
 
   @Prop({ required: true })
   price: number;
@@ -32,14 +32,18 @@ export class Article {
   @Prop({ type: Object })
   address: {
     streetAddress: string;
-    latitude: number;
-    longitude: number;
     provinceCode: number;
     districtCode: number;
     wardCode: number;
     provinceName: string;
     districtName: string;
     wardName: string;
+  };
+
+  @Prop({ type: Object })
+  location: {
+    coordinates: number[];
+    type: string;
   };
 
   @Prop({ required: true })
@@ -75,5 +79,4 @@ export class Article {
   @Prop()
   isDelete: boolean;
 }
-
 export const ArticleSchema = SchemaFactory.createForClass(Article);
