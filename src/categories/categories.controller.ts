@@ -27,6 +27,7 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto, user);
   }
 
+  @Public()
   @ApiQuery({ name: 'name', required: false, example: '/Nhà/i' })
   @ApiOperation({ summary: 'Get all categories with pagination' })
   @ResponseMessage('fetch categories with pagination')
