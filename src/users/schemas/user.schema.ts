@@ -39,8 +39,14 @@ export class User {
     wardName: string;
   };
 
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  followers: User[];
+  
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  followings: User[];
+
   @Prop()
-  refreshToken: string
+  refreshToken: string;
 
   @Prop()
   createdAt: Date;

@@ -29,7 +29,7 @@ export class CategoriesService {
   }
 
   async findAll(currentPage: number, limit: number, qs: string) {
-    const { filter, sort, population } = aqp(qs);
+    const { filter, sort, population, projection } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
 
@@ -40,11 +40,15 @@ export class CategoriesService {
 
     const results = await this.categoryModel
       .find(filter)
-      .select('-password')
+      .select(projection)
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
-      .populate(population)
+      .populate({
+        ...population,
+        path: 'createdBy',
+        select: { fullName: 1, avatar: 1, email: 1, role: 1 },
+      })
       .exec();
 
     return {
@@ -64,7 +68,7 @@ export class CategoriesService {
     }
     return await this.categoryModel.findById(id).populate({
       path: 'createdBy',
-      select: 'fullName avatar email',
+      select: { fullName: 1, avatar: 1 },
     });
   }
 

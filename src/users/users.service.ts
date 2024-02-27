@@ -1,9 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  CreateUserDto,
-  RegisterUserDto,
-} from './dto/create-user.dto';
-import { User as UserModel, UserDocument, User } from './schemas/user.schema';
+import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
+import { User as UserModel, UserDocument } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
@@ -18,7 +15,6 @@ export class UsersService {
   constructor(
     @InjectModel(UserModel.name)
     private userModel: SoftDeleteModel<UserDocument>,
-
     private configService: ConfigService,
   ) {}
   hashPassword = (password: string) => {
@@ -149,7 +145,12 @@ export class UsersService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return 'Can not found this user';
     }
-    const user = this.userModel.findOne({ _id: id }).select('-password');
+    const user = await this.userModel
+      .findById(id)
+      .select('-password -refreshToken')
+      .populate({ path: 'followings', select: { fullName: 1, avatar: 1 } })
+      .populate({ path: 'followers', select: { fullName: 1, avatar: 1 } });
+
     return user;
   }
 

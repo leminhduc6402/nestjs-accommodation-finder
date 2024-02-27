@@ -10,6 +10,7 @@ import { ArticlesModule } from './articles/articles.module';
 import { FilesModule } from './files/files.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CommentsModule } from './comments/comments.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CommentsModule } from './comments/comments.module';
     FilesModule,
     CategoriesModule,
     CommentsModule,
+    FollowModule,
   ],
   controllers: [AppController],
   providers: [AppService],
