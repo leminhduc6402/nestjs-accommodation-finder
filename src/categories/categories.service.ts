@@ -46,7 +46,7 @@ export class CategoriesService {
       .sort(sort as any)
       .populate({
         ...population,
-        path: 'createdBy',
+        path: 'createdBy updatedBy',
         select: { fullName: 1, avatar: 1, email: 1, role: 1 },
       })
       .exec();
