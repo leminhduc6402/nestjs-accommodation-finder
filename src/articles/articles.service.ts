@@ -89,7 +89,7 @@ export class ArticlesService {
       throw new BadRequestException('Not found article with id');
     }
     const article = await this.articleModel.findById(id).populate({
-      path: 'createdBy',
+      path: 'createdBy updatedBy',
       select: 'fullName email phone avatar',
     });
     const comments = await this.commentService.findAllByArticleId(
@@ -140,4 +140,5 @@ export class ArticlesService {
     });
     return articles;
   }
+ 
 }

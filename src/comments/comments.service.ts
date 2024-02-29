@@ -111,34 +111,62 @@ export class CommentsService {
   }
 
   async editReply(_id: string, updateReplyDto: UpdateReplyDto, user: IUser) {
+    // if (!mongoose.Types.ObjectId.isValid(_id)) {
+    //   throw new BadRequestException('Must be ObjectId type');
+    // }
+
+    // const comment = await this.commentModel.findById(_id);
+    // if (!comment) {
+    //   throw new NotFoundException('Not found the comment');
+    // }
+    // const { content, reply_id } = updateReplyDto;
+    // const reply = comment.replies.find(
+    //   (reply) => reply._id === reply_id,
+    // );
+    
+    // if (!reply) {
+    //   throw new NotFoundException('Reply not found');
+    // }
+    // // Cập nhật nội dung của reply
+    // reply.content = content;
+    // reply.updatedBy = {
+    //   _id: user._id as unknown as ObjectId,
+    //   email: user.email,
+    //   fullName: user.fullName,
+    //   avatar: user.avatar,
+    // };
+
+    // // Lưu lại comment
+    // await comment.save();
+
+    // return comment;
     if (!mongoose.Types.ObjectId.isValid(_id)) {
       throw new BadRequestException('Must be ObjectId type');
-    }
+  }
 
-    const comment = await this.commentModel.findById(_id);
-    if (!comment) {
-      throw new NotFoundException('Not found the comment');
-    }
-    const { content, reply_id } = updateReplyDto;
-    const reply = comment.replies.find(
-      (reply) => reply._id === reply_id,
-    );
-    if (!reply) {
-      throw new NotFoundException('Reply not found');
-    }
-    // Cập nhật nội dung của reply
-    reply.content = content;
-    reply.updatedBy = {
-      _id: user._id as unknown as ObjectId,
-      email: user.email,
-      fullName: user.fullName,
-      avatar: user.avatar,
-    };
+  const { content, reply_id } = updateReplyDto;
 
-    // Lưu lại comment
-    await comment.save();
+  const updatedComment = await this.commentModel.findOneAndUpdate(
+      { _id, 'replies._id': reply_id },
+      {
+          $set: {
+              'replies.$.content': content,
+              'replies.$.updatedBy': {
+                  _id: user._id,
+                  email: user.email,
+                  fullName: user.fullName,
+                  avatar: user.avatar,
+              }
+          }
+      },
+      { new: true }
+  );
 
-    return reply;
+  if (!updatedComment) {
+      throw new NotFoundException('Comment or Reply not found');
+  }
+
+  return updatedComment;
   }
 
   // async removeReply(_id: string, reply_id: string) {

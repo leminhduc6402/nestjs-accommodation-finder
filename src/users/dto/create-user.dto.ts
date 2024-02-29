@@ -84,9 +84,13 @@ export class UserLoginDto {
   readonly password: string;
 }
 
-// export class QueryStringUser {
-//   @ApiProperty({
-//     example: '/le/i',
-//   })
-//   fullName: string;
-// }
+export class UserLoginWithGGDto {
+  @IsNotEmpty()
+  fullName: string;
+
+  @IsNotEmpty()
+  email: string;
+
+  @IsNotEmpty()
+  avatar: string
+}

@@ -9,11 +9,12 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto, UserLoginDto } from 'src/users/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { IUser } from 'src/users/users.interface';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -70,5 +71,24 @@ export class AuthController {
     @User() user: IUser,
   ) {
     return this.authService.logout(response, user);
+  }
+
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  @ResponseMessage('Login with google account')
+  @Get('google/login')
+  handleLoginWithGoogle() {
+    return 'Google Authentication';
+  }
+
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  @ResponseMessage('Login with google account')
+  @Get('google/redirect')
+  handleRedirectGoogle(
+    @Req() req: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.authService.login(req.user, response);
   }
 }

@@ -2,7 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { IUser } from 'src/users/users.interface';
-import { RegisterUserDto } from 'src/users/dto/create-user.dto';
+import {
+  RegisterUserDto,
+  UserLoginWithGGDto,
+} from 'src/users/dto/create-user.dto';
 import ms from 'ms';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
@@ -27,6 +30,29 @@ export class AuthService {
     return null;
   }
 
+  async validateUserLoginWithGG(
+    email: string,
+    fullName: string,
+    avatar: string,
+  ): Promise<any> {
+    const user = await this.usersService.findOneByEmail(email);
+    if (user) {
+      return user;
+    }
+    const userLoginWithGGDto: UserLoginWithGGDto = {
+      email,
+      fullName,
+      avatar,
+    };
+    const newUser =
+      await this.usersService.registerByGoogleAccount(userLoginWithGGDto);
+    return newUser;
+  }
+
+  async findUserByEmail(email: string) {
+    return await this.usersService.findOneByEmail(email);
+  }
+
   async login(user: IUser, response: Response) {
     const {
       _id,
@@ -42,6 +68,7 @@ export class AuthService {
       _id,
       fullName,
       email,
+      avatar,
       role,
     };
     const refresh_token = this.createRefreshToken(payload);
@@ -71,6 +98,7 @@ export class AuthService {
     };
   }
 
+  //tạo user database và passcode
   async register(registerUserDto: RegisterUserDto) {
     const newUser = await this.usersService.register(registerUserDto);
     // Gửi mail
