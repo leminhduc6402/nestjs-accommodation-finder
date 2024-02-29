@@ -10,12 +10,14 @@ import ms from 'ms';
 import { JwtStrategy } from './passport/jwt.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { GoogleStrategy } from './passport/google.strategy';
+import { SessionSerializer } from './serializers/serializer';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     UsersModule,
-    PassportModule,
+    PassportModule.register({ session: true }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -27,7 +29,7 @@ import { User, UserSchema } from 'src/users/schemas/user.schema';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy, SessionSerializer],
   controllers: [AuthController],
   exports: [AuthService],
 })

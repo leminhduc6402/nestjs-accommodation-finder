@@ -4,10 +4,12 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from './core/transform.interceptor';
+import session from 'express-session';
+import passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -41,6 +43,20 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: ['1'],
   });
+
+  //Config express session
+  app.use(
+    session({
+      secret: 'ahsdiahiwhkjaalahfwhoiawieouqiokajsfaslkjhfdaskjd',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 60000 * 60,
+      },
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   // Config Swagger
   const config = new DocumentBuilder()

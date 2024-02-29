@@ -1,5 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  CreateUserDto,
+  RegisterUserDto,
+  UserLoginWithGGDto,
+} from './dto/create-user.dto';
 import { User as UserModel, UserDocument } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -48,6 +56,24 @@ export class UsersService {
       email,
       password: hashPassword,
       avatar: default_avatar,
+      // role: userRole._id,
+      role: 'USER',
+    });
+    return newRegister;
+  }
+
+  async registerByGoogleAccount(userLoginWithGGDto: UserLoginWithGGDto) {
+    const { email, fullName, avatar } = userLoginWithGGDto;
+    //check email
+    const isExist = await this.userModel.findOne({ email });
+    if (isExist) {
+      throw new BadRequestException(`Email: ${email} already exists`);
+    }
+
+    let newRegister = await this.userModel.create({
+      fullName,
+      email,
+      avatar: avatar,
       // role: userRole._id,
       role: 'USER',
     });
@@ -143,7 +169,7 @@ export class UsersService {
 
   async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return 'Can not found this user';
+      throw new NotFoundException('Can not found this user');
     }
     const user = await this.userModel
       .findById(id)

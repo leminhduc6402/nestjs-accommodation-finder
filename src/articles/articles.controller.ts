@@ -65,10 +65,13 @@ export class ArticlesController {
   }
 
   @Public()
-  @ApiOperation({ summary: 'Get an article by id' })
-  @ResponseMessage('Get an article by id')
-  @Get('search-by-location')
-  findByLocation(@Query('longitude') longitude: string, @Query('latitude') latitude: string) {
+  @ApiOperation({ summary: 'Get an article by location' })
+  @ResponseMessage('Get an article by location')
+  @Get('maps/search-by-location')
+  findByLocation(
+    @Query('longitude') longitude: string,
+    @Query('latitude') latitude: string,
+  ) {
     return this.articlesService.findByLocation(+longitude, +latitude);
   }
 }
