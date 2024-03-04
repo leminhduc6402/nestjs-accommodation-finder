@@ -62,7 +62,7 @@ export class UsersService {
     return newRegister;
   }
 
-  async registerByGoogleAccount(userLoginWithGGDto: UserLoginWithGGDto) {
+  async registerBySocialAccount(userLoginWithGGDto: UserLoginWithGGDto) {
     const { email, fullName, avatar } = userLoginWithGGDto;
     //check email
     const isExist = await this.userModel.findOne({ email });
