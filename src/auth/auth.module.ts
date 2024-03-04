@@ -12,6 +12,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { GoogleStrategy } from './passport/google.strategy';
 import { SessionSerializer } from './serializers/serializer';
+import { FacebookStrategy } from './passport/facebook.strategy';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { SessionSerializer } from './serializers/serializer';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy, SessionSerializer],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy, SessionSerializer, FacebookStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

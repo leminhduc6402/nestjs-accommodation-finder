@@ -15,6 +15,8 @@ import { RegisterUserDto, UserLoginDto } from 'src/users/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { IUser } from 'src/users/users.interface';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { FacebookAuthGuard } from './guards/facebook-auth.guard';
+import { AuthGuard } from '@nestjs/passport';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -86,6 +88,25 @@ export class AuthController {
   @ResponseMessage('Login with google account')
   @Get('google/redirect')
   handleRedirectGoogle(
+    @Req() req: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.authService.login(req.user, response);
+  }
+
+  @Public()
+  @UseGuards(FacebookAuthGuard)
+  @ResponseMessage('Login with Facebook account')
+  @Get('facebook')
+  handleLoginWithFB() {
+    return 'Facebook Authentication';
+  }
+
+  @Public()
+  @UseGuards(FacebookAuthGuard)
+  @ResponseMessage('Login with Facebook account')
+  @Get('facebook/callback')
+  handleRedirectFB(
     @Req() req: any,
     @Res({ passthrough: true }) response: Response,
   ) {

@@ -30,7 +30,7 @@ export class AuthService {
     return null;
   }
 
-  async validateUserLoginWithGG(
+  async validateUserWithSocial(
     email: string,
     fullName: string,
     avatar: string,
@@ -45,7 +45,7 @@ export class AuthService {
       avatar,
     };
     const newUser =
-      await this.usersService.registerByGoogleAccount(userLoginWithGGDto);
+      await this.usersService.registerBySocialAccount(userLoginWithGGDto);
     return newUser;
   }
 
