@@ -6,24 +6,28 @@ import { AuthService } from '../auth.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    private authService: AuthService,
-  ) {
-    super({
-      clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
-      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
-      scope: ['profile', 'email'],
-    });
-  }
+    constructor(
+        private configService: ConfigService,
+        private authService: AuthService,
+    ) {
+        super({
+            clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
+            clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
+            callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
+            scope: ['profile', 'email'],
+        });
+    }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const user = await this.authService.validateUserWithSocial(
-      profile.emails[0].value,
-      profile.displayName,
-      profile.photos[0].value,
-    );
-    return user;
-  }
+    async validate(
+        accessToken: string,
+        refreshToken: string,
+        profile: Profile,
+    ) {
+        const user = await this.authService.validateUserWithSocial(
+            profile.emails[0].value,
+            profile.displayName,
+            profile.photos[0].value,
+        );
+        return user;
+    }
 }
