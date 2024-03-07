@@ -11,6 +11,7 @@ import { FilesModule } from './files/files.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CommentsModule } from './comments/comments.module';
 import { FollowModule } from './follow/follow.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FollowModule } from './follow/follow.module';
     CategoriesModule,
     CommentsModule,
     FollowModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

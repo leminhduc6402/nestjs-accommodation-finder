@@ -6,26 +6,33 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    private authService: AuthService,
-  ) {
-    super({
-      clientID: configService.get<string>('FACEBOOK_APP_ID'),
-      clientSecret: configService.get<string>('FACEBOOK_APP_SECRET'),
-      callbackURL: configService.get<string>('FACEBOOK_APP_CALLBACK_URL'),
-      scope: ['email'],
-      profileFields: ['emails', 'name', 'displayName', 'picture'],
-    });
-  }
+    constructor(
+        private configService: ConfigService,
+        private authService: AuthService,
+    ) {
+        super({
+            clientID: configService.get<string>('FACEBOOK_APP_ID'),
+            clientSecret: configService.get<string>('FACEBOOK_APP_SECRET'),
+            callbackURL: configService.get<string>('FACEBOOK_APP_CALLBACK_URL'),
+            scope: ['email'],
+            profileFields: ['emails', 'name', 'displayName', 'picture'],
+        });
+    }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const pictureUrl = `https://graph.facebook.com/${profile.id}/picture?type=large`;
-    const user = await this.authService.validateUserWithSocial(
-      profile.emails[0].value,
-      profile.displayName,
-      pictureUrl,
-    );
-    return user;
-  }
+    async validate(
+        accessToken: string,
+        refreshToken: string,
+        profile: Profile,
+    ) {
+        const pictureUrl = `https://graph.facebook.com/${profile.id}/picture?type=large`;
+        const user = await this.authService.validateUserWithSocial(
+            profile.emails[0].value,
+            profile.displayName,
+            pictureUrl,
+        );
+        console.log('profile: ', profile);
+        console.log('accessToken: ', accessToken);
+        console.log('refreshToken: ', refreshToken);
+        return user;
+    }
 }
