@@ -26,7 +26,6 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findOneByEmail(email);
-
         if (user) {
             if (user.active === false) {
                 this.usersService.destroy(user.email);
@@ -72,9 +71,12 @@ export class AuthService {
             email,
             fullName,
             avatar,
+            followers,
+            followings,
             role,
             // , permissions
         } = user;
+
         const payload = {
             sub: 'token login',
             iss: 'from server',
@@ -105,6 +107,8 @@ export class AuthService {
                 fullName,
                 email,
                 avatar,
+                followers,
+                followings,
                 role,
                 // permissions,
             },
@@ -198,6 +202,7 @@ export class AuthService {
         const a = await this.mailService.getPasscode(email);
         if (passcode === a) {
             await this.usersService.verifyUser(email);
+            await this.cacheManager.del(email);
             return true;
         }
         return false;

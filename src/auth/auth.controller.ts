@@ -21,10 +21,7 @@ import { MailService } from 'src/mail/mail.service';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-        private mailService: MailService,
-    ) {}
+    constructor(private authService: AuthService) {}
 
     @Public()
     @UseGuards(LocalAuthGuard)
@@ -45,9 +42,6 @@ export class AuthController {
     @Post('/register')
     async register(@Body() registerUserDto: RegisterUserDto) {
         const user = await this.authService.register(registerUserDto);
-        if (user) {
-            await this.mailService.sendPasscode(user.email, 'confirm-code');
-        }
         return user;
     }
 
@@ -121,7 +115,10 @@ export class AuthController {
     @Public()
     @ResponseMessage('Verify account')
     @Post('verify')
-    async verifyAccount(@Body('email') email: string, @Body('passcode') passcode: number) {
-        return await this.authService.verify(email, passcode)
+    async verifyAccount(
+        @Body('email') email: string,
+        @Body('passcode') passcode: number,
+    ) {
+        return await this.authService.verify(email, passcode);
     }
 }
