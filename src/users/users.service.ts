@@ -195,9 +195,14 @@ export class UsersService {
     }
 
     async findOneByEmail(email: string) {
-        return this.userModel.findOne({
-            email,
-        });
+        return this.userModel
+            .findOne({
+                email,
+            })
+            .populate({
+                path: 'followers followings',
+                select: { _id: 1, fullName: 1, avatar: 1 },
+            });
         // .populate({ path: 'role', select: { name: 1 } });
     }
 
@@ -216,7 +221,10 @@ export class UsersService {
             return 'not found user';
         }
         const foundUser = await this.userModel.findById(id);
-        if (foundUser && foundUser.email === 'leminhduc6402@gmail.com')
+        if (
+            foundUser &&
+            foundUser.email === this.configService.get<string>('EMAIL_ACCOUNT')
+        )
             throw new BadRequestException(
                 'You do not have enough permission to remove this account',
             );
@@ -233,6 +241,11 @@ export class UsersService {
     }
 
     async destroy(email: string) {
+        if (email === this.configService.get<string>('EMAIL_ACCOUNT'))
+            throw new BadRequestException(
+                'You do not have enough permission to remove this account',
+            );
+
         await this.userModel.deleteOne({ email });
         return null;
     }

@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Inject, UseInterceptors } from '@nestjs/common';
-import { Public, ResponseMessage } from 'src/customDecorator/customize';
 import { MailerService } from '@nestjs-modules/mailer';
-import { MailService } from './mail.service';
-import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Body, Controller, Get, Inject } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { Cache } from 'cache-manager';
+import { Public, ResponseMessage } from 'src/customDecorator/customize';
+import { MailService } from './mail.service';
+import { SendMailDto } from './dto/mail.dto';
 
+@ApiTags('Mail')
 @Controller('mail')
 export class MailController {
     constructor(
@@ -16,6 +19,7 @@ export class MailController {
 
     @Public()
     @ResponseMessage('Test email')
+    @ApiOperation({ summary: 'Test send mail' })
     @Get()
     async handleTestEmail() {
         await this.mailerService.sendMail({
@@ -24,6 +28,15 @@ export class MailController {
             subject: 'Welcome to Nice App! Confirm your Email',
             template: 'test',
         });
+    }
+
+    @Public()
+    @ResponseMessage('Send passcode via email')
+    @ApiOperation({ summary: 'Send passcode' })
+    @Get('send-passcode')
+    async sendPasscode(@Body() sendMailDto: SendMailDto) {
+        this.mailService.sendPasscode(sendMailDto, 'confirm-code');
+        return true;
     }
 
     @Public()

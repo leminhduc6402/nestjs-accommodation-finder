@@ -41,26 +41,29 @@ import { IUser } from 'src/users/users.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private configService: ConfigService) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET_ACCESS_TOKEN'),
-    });
-  }
+    constructor(private configService: ConfigService) {
+        super({
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ignoreExpiration: false,
+            secretOrKey: configService.get<string>('JWT_SECRET_ACCESS_TOKEN'),
+        });
+    }
 
-  async validate(payload: IUser) {
-    const { _id, email, fullName, avatar, role } = payload;
-    // Logic check permissions
-    // const userRole = role as unknown as { _id: string; name: string };
-    // const temp = (await this.rolesService.findOne(userRole._id)).toObject();
-    return {
-      _id,
-      email,
-      fullName,
-      avatar,
-      role,
-      // permissions: (await temp).permissions ?? [],
-    };
-  }
+    async validate(payload: IUser) {
+        const { _id, email, fullName, avatar, role, followers, followings } =
+            payload;
+        // Logic check permissions
+        // const userRole = role as unknown as { _id: string; name: string };
+        // const temp = (await this.rolesService.findOne(userRole._id)).toObject();
+        return {
+            _id,
+            email,
+            fullName,
+            avatar,
+            followers,
+            followings,
+            role,
+            // permissions: (await temp).permissions ?? [],
+        };
+    }
 }
