@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Body, Controller, Get, Inject } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { Cache } from 'cache-manager';
 import { Public, ResponseMessage } from 'src/customDecorator/customize';
@@ -33,7 +33,7 @@ export class MailController {
     @Public()
     @ResponseMessage('Send passcode via email')
     @ApiOperation({ summary: 'Send passcode' })
-    @Get('send-passcode')
+    @Post('send-passcode')
     async sendPasscode(@Body() sendMailDto: SendMailDto) {
         this.mailService.sendPasscode(sendMailDto, 'confirm-code');
         return true;
