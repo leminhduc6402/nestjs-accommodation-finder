@@ -27,10 +27,10 @@ export class AuthService {
     async validateUser(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findOneByEmail(email);
         if (user) {
-            if (user.active === false) {
-                this.usersService.destroy(user.email);
-                return null;
-            }
+            // if (user.active === false) {
+            //     this.usersService.destroy(user.email);
+            //     return null;
+            // }
             const isValid = this.usersService.isValidPassword(
                 pass,
                 user.password,
