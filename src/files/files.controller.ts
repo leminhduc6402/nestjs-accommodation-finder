@@ -70,8 +70,8 @@ export class FilesController {
   //   return this.filesService.update(+id, updateFileDto);
   // }
 
-  @ApiOperation({ summary: 'Delete a file' })
-  @ResponseMessage('Delete a file')
+  @ApiOperation({ summary: 'Remove a file' })
+  @ResponseMessage('Remove a file')
   @Delete(':name')
   remove(@Param('name') name: string, @User() user: IUser) {
     return this.filesService.remove(name, user);

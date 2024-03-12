@@ -107,7 +107,7 @@ export class UsersService {
 
         const results = await this.userModel
             .find(filter)
-            .select('-password')
+            .select('-password -refreshToken')
             .skip(offset)
             .limit(defaultLimit)
             .sort(sort as any)
@@ -183,13 +183,13 @@ export class UsersService {
             .findById(id)
             .select('-password -refreshToken')
             .populate({
-                path: 'followings',
+                path: 'followings followers',
                 select: { fullName: 1, avatar: 1 },
             })
-            .populate({
-                path: 'followers',
-                select: { fullName: 1, avatar: 1 },
-            });
+            // .populate({
+            //     path: 'followers',
+            //     select: { fullName: 1, avatar: 1 },
+            // });
 
         return user;
     }
