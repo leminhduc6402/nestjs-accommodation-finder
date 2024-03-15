@@ -1,27 +1,23 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import aqp from 'api-query-params';
+import mongoose from 'mongoose';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { CommentsService } from 'src/comments/comments.service';
+import { IUser } from 'src/users/users.interface';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { Article, ArticleDocument } from './schemas/article.schema';
-import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { ConfigService } from '@nestjs/config';
-import { IUser } from 'src/users/users.interface';
-import mongoose from 'mongoose';
-import aqp from 'api-query-params';
-import { CommentsService } from 'src/comments/comments.service';
-import path from 'path';
 
 @Injectable()
 export class ArticlesService {
     constructor(
         @InjectModel(Article.name)
         private articleModel: SoftDeleteModel<ArticleDocument>,
-        private configService: ConfigService,
         private commentService: CommentsService,
     ) {}
 
     async create(createArticleDto: CreateArticleDto, user: IUser) {
-        // await this.articleModel.createIndexes();
         const {
             streetAddress,
             latitude,
@@ -35,6 +31,7 @@ export class ArticlesService {
         } = createArticleDto;
         const article = await this.articleModel.create({
             ...createArticleDto,
+            status: 'UNVERIFY',
             address: {
                 streetAddress,
                 provinceCode,
@@ -75,12 +72,12 @@ export class ArticlesService {
 
         return {
             meta: {
-                current: currentPage, //trang hiện tại
-                pageSize: limit, //số lượng bản ghi đã lấy
-                pages: totalPages, //tổng số trang với điều kiện query
-                total: totalItems, // tổng số phần tử (số bản ghi)
+                current: currentPage,
+                pageSize: limit,
+                pages: totalPages,
+                total: totalItems,
             },
-            results, //kết quả query
+            results,
         };
     }
 

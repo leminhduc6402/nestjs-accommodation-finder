@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import otpGenerator from 'otp-generator';
 import { SendMailDto } from './dto/mail.dto';
@@ -34,6 +34,10 @@ export class MailService {
         });
     }
     async getPasscode(email: string) {
-        return await this.cacheManager.get(email);
+        const passcode = await this.cacheManager.get(email);
+        if (!passcode) {
+            throw new NotFoundException()
+        }
+        return passcode;
     }
 }
