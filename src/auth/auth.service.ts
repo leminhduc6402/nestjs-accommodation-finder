@@ -17,6 +17,7 @@ import { Response } from 'express';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { MailService } from 'src/mail/mail.service';
+import { VerifyDto } from './dto/auth-dto';
 
 @Injectable()
 export class AuthService {
@@ -202,7 +203,8 @@ export class AuthService {
         return 'Logout success';
     };
 
-    verify = async (email: string, passcode: number) => {
+    verify = async (verifyDto: VerifyDto) => {
+        const { email, passcode } = verifyDto;
         const a = await this.mailService.getPasscode(email);
         if (passcode === a) {
             await this.usersService.verifyUser(email);
