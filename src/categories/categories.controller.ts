@@ -58,6 +58,7 @@ export class CategoriesController {
     return this.categoriesService.update(id, updateCategoryDto, user);
   }
 
+  @ApiOperation({ summary: 'Remove a category' })
   @Delete(':id')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.categoriesService.remove(id, user);

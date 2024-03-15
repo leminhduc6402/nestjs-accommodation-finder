@@ -19,6 +19,9 @@ export class CreateArticleDto {
   acreage: number;
 
   @IsNotEmpty()
+  quantity: number;
+
+  @IsNotEmpty()
   streetAddress: string;
 
   @IsNotEmpty()

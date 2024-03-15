@@ -32,6 +32,10 @@ export class CreateUserDto {
     @IsNotEmpty()
     role: string;
 
+    @ApiProperty()
+    @IsNotEmpty()
+    active: boolean;
+
     @ApiProperty({ required: false })
     streetAddress: string;
 

@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Inject,
+    Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { IUser } from 'src/users/users.interface';
@@ -27,10 +32,9 @@ export class AuthService {
     async validateUser(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findOneByEmail(email);
         if (user) {
-            // if (user.active === false) {
-            //     this.usersService.destroy(user.email);
-            //     return null;
-            // }
+            if (user.active === false) {
+                throw new ForbiddenException();
+            }
             const isValid = this.usersService.isValidPassword(
                 pass,
                 user.password,
