@@ -17,6 +17,7 @@ import { IUser } from 'src/users/users.interface';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 import { MailService } from 'src/mail/mail.service';
+import { VerifyDto } from './dto/auth-dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -114,11 +115,9 @@ export class AuthController {
 
     @Public()
     @ResponseMessage('Verify account')
+    @ApiBody({ type: VerifyDto })
     @Post('verify')
-    async verifyAccount(
-        @Body('email') email: string,
-        @Body('passcode') passcode: number,
-    ) {
-        return await this.authService.verify(email, passcode);
+    async verifyAccount(@Body() verifyDto: VerifyDto) {
+        return await this.authService.verify(verifyDto);
     }
 }
