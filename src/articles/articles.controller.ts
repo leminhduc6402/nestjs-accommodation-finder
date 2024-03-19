@@ -14,6 +14,7 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IUser } from 'src/users/users.interface';
+import { CreateVerificationDto } from 'src/verification/dto/create-verification.dto';
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
@@ -73,5 +74,12 @@ export class ArticlesController {
         @Query('latitude') latitude: string,
     ) {
         return this.articlesService.findByLocation(+longitude, +latitude);
+    }
+
+    @ApiOperation({ summary: 'Verify the article' })
+    @ResponseMessage('Verify the article')
+    @Patch('verify/:id')
+    verify(@Param('id') id: string, @User() user: IUser) {
+        return this.articlesService.verify(id, user);
     }
 }

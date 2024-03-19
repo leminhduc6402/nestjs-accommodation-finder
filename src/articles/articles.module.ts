@@ -4,6 +4,7 @@ import { ArticlesController } from './articles.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Article, ArticleSchema } from './schemas/article.schema';
 import { CommentsModule } from 'src/comments/comments.module';
+import { VerificationModule } from 'src/verification/verification.module';
 
 @Module({
   imports: [
