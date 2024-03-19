@@ -7,17 +7,17 @@ import {
     Res,
     UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RegisterUserDto, UserLoginDto } from 'src/users/dto/create-user.dto';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { Request, Response } from 'express';
+import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
+import { RegisterUserDto, UserLoginDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { FacebookAuthGuard } from './guards/facebook-auth.guard';
-import { MailService } from 'src/mail/mail.service';
+import { AuthService } from './auth.service';
 import { VerifyDto } from './dto/auth-dto';
+import { FacebookAuthGuard } from './guards/facebook-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -28,6 +28,7 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     @ApiBody({ type: UserLoginDto })
     @ApiOperation({ summary: 'Login' })
+    @UseGuards(ThrottlerGuard)
     @Post('/login')
     @ResponseMessage('User login')
     async handleLogin(

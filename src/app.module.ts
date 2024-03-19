@@ -12,9 +12,15 @@ import { CategoriesModule } from './categories/categories.module';
 import { CommentsModule } from './comments/comments.module';
 import { FollowModule } from './follow/follow.module';
 import { MailModule } from './mail/mail.module';
+import { VerificationModule } from './verification/verification.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 10,
+    }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -37,6 +43,7 @@ import { MailModule } from './mail/mail.module';
     CommentsModule,
     FollowModule,
     MailModule,
+    VerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

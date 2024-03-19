@@ -8,6 +8,7 @@ import { IUser } from 'src/users/users.interface';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article, ArticleDocument } from './schemas/article.schema';
+import { CreateVerificationDto } from 'src/verification/dto/create-verification.dto';
 
 @Injectable()
 export class ArticlesService {
@@ -142,5 +143,23 @@ export class ArticlesService {
             },
         });
         return articles;
+    }
+
+    verify(_id: string, user: IUser) {
+        const expirationDate = new Date();
+        expirationDate.setMonth(expirationDate.getMonth() + 1);
+
+        return this.articleModel.updateOne(
+            {
+                _id,
+            },
+            {
+                status: 'VERIFY',
+                expiredAt: expirationDate.setMonth(
+                    expirationDate.getMonth() + 1,
+                ),
+                updatedBy: user._id,
+            },
+        );
     }
 }

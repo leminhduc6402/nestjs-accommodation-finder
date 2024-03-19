@@ -33,6 +33,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.3.0",
     "@nestjs/swagger": "^7.1.17",
+    "@nestjs/throttler": "^5.1.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/mongoose": "^5.11.97",
     "@types/ms": "^0.7.34",
