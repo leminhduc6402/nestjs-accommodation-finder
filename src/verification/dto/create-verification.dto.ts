@@ -16,4 +16,6 @@ export class CreateVerificationDto {
     @IsNotEmpty()
     @IsMongoId()
     articleId: string;
+
+    status: string;
 }

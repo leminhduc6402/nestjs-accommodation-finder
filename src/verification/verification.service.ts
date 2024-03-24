@@ -13,6 +13,7 @@ import {
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import { Article, ArticleDocument } from 'src/articles/schemas/article.schema';
+import { ArticlesService } from 'src/articles/articles.service';
 
 @Injectable()
 export class VerificationService {
@@ -21,6 +22,7 @@ export class VerificationService {
         private verificationModel: SoftDeleteModel<VerificationDocument>,
         @InjectModel(Article.name)
         private articleModel: SoftDeleteModel<ArticleDocument>,
+        private articleService: ArticlesService,
     ) {}
 
     async create(createVerificationDto: CreateVerificationDto, user: IUser) {
@@ -42,9 +44,13 @@ export class VerificationService {
             { _id: articleId },
             {
                 status: 'PENDING',
+                updatedBy: user._id,
             },
         );
-        return await this.verificationModel.create(createVerificationDto);
+        return await this.verificationModel.create({
+            ...createVerificationDto,
+            createdBy: user._id,
+        });
     }
 
     findAll() {
@@ -57,8 +63,15 @@ export class VerificationService {
             .populate({ path: 'articleId' });
     }
 
-    update(id: number, updateVerificationDto: UpdateVerificationDto) {
-        return `This action updates a #${id} verification`;
+    async update(id: string, status: string, user: IUser) {
+        const verification = await this.verificationModel.findById(id);
+        const { articleId } = verification;
+        const article = await this.articleService.update(
+            articleId.toString(),
+            { status },
+            user,
+        );
+        return article;
     }
 
     remove(id: number) {

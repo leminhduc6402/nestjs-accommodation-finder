@@ -1,17 +1,21 @@
 import { Module } from '@nestjs/common';
-import { ArticlesService } from './articles.service';
-import { ArticlesController } from './articles.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Article, ArticleSchema } from './schemas/article.schema';
 import { CommentsModule } from 'src/comments/comments.module';
-import { VerificationModule } from 'src/verification/verification.module';
+import { ArticlesController } from './articles.controller';
+import { ArticlesService } from './articles.service';
+import { Article, ArticleSchema } from './schemas/article.schema';
+import { Verification, VerificationSchema } from 'src/verification/schemas/verification.schema';
 
 @Module({
-  imports: [
-    CommentsModule,
-    MongooseModule.forFeature([{ name: Article.name, schema: ArticleSchema }]),
-  ],
-  controllers: [ArticlesController],
-  providers: [ArticlesService],
+    imports: [
+        CommentsModule,
+        MongooseModule.forFeature([
+            { name: Article.name, schema: ArticleSchema },
+            { name: Verification.name, schema: VerificationSchema },
+        ]),
+    ],
+    controllers: [ArticlesController],
+    providers: [ArticlesService],
+    exports: [ArticlesService]
 })
 export class ArticlesModule {}

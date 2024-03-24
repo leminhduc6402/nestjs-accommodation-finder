@@ -5,6 +5,7 @@ export interface IUser {
     fullName: string;
     email: string;
     avatar: string;
+    phone: string;
     role: string;
     followers: {
         _id: string;

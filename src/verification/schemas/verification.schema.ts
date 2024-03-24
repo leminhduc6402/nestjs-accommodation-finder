@@ -8,16 +8,19 @@ export type VerificationDocument = HydratedDocument<Verification>;
 @Schema({ timestamps: true })
 export class Verification {
     @Prop()
-    personalIdImage: string;
+    personalIdImage: string[];
 
     @Prop()
-    latedImage: string;
+    latedImage: string[];
 
     @Prop()
-    contract: string;
+    contract: string[];
 
     @Prop()
-    video: string;
+    video: string[];
+
+    @Prop()
+    status: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Article.name })
     articleId: mongoose.Schema.Types.ObjectId

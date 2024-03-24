@@ -38,17 +38,4 @@ export class MailController {
         this.mailService.sendPasscode(sendMailDto, 'confirm-code');
         return true;
     }
-
-    @Public()
-    @Get('set-code')
-    async setPasscode(@Body('email') email: string) {
-        await this.cacheManager.set(email, '123456');
-        return true;
-    }
-
-    @Public()
-    @Get('get-code')
-    async getPasscode(@Body('email') email: string) {
-        return await this.cacheManager.get(email);
-    }
 }

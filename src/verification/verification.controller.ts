@@ -38,12 +38,13 @@ export class VerificationController {
         return this.verificationService.findOne(id);
     }
 
-    @Patch(':id')
+    @Patch()
     update(
-        @Param('id') id: string,
-        @Body() updateVerificationDto: UpdateVerificationDto,
+        @Body('id') id: string,
+        @Body('status') status: string,
+        @User() user: IUser,
     ) {
-        return this.verificationService.update(+id, updateVerificationDto);
+        return this.verificationService.update(id, status, user);
     }
 
     @Delete(':id')
