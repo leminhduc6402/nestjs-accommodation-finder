@@ -14,38 +14,39 @@ import { FollowModule } from './follow/follow.module';
 import { MailModule } from './mail/mail.module';
 import { VerificationModule } from './verification/verification.module';
 import { ThrottlerModule } from '@nestjs/throttler';
-//ahdkjashdkjashdjk
 @Module({
-  imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 10,
-    }]),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_CONNECTION_STRING'),
-        connectionFactory: (connection: any) => {
-          connection.plugin(softDeletePlugin);
-          return connection;
-        },
-      }),
-      inject: [ConfigService],
-    }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    UsersModule,
-    AuthModule,
-    ArticlesModule,
-    FilesModule,
-    CategoriesModule,
-    CommentsModule,
-    FollowModule,
-    MailModule,
-    VerificationModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [
+        ThrottlerModule.forRoot([
+            {
+                ttl: 10000,
+                limit: 5,
+            },
+        ]),
+        MongooseModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                uri: configService.get<string>('MONGO_CONNECTION_STRING'),
+                connectionFactory: (connection: any) => {
+                    connection.plugin(softDeletePlugin);
+                    return connection;
+                },
+            }),
+            inject: [ConfigService],
+        }),
+        ConfigModule.forRoot({
+            isGlobal: true,
+        }),
+        UsersModule,
+        AuthModule,
+        ArticlesModule,
+        FilesModule,
+        CategoriesModule,
+        CommentsModule,
+        FollowModule,
+        MailModule,
+        VerificationModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}

@@ -185,11 +185,11 @@ export class UsersService {
             .populate({
                 path: 'followings followers',
                 select: { fullName: 1, avatar: 1 },
-            })
-            // .populate({
-            //     path: 'followers',
-            //     select: { fullName: 1, avatar: 1 },
-            // });
+            });
+        // .populate({
+        //     path: 'followers',
+        //     select: { fullName: 1, avatar: 1 },
+        // });
 
         return user;
     }
@@ -207,10 +207,32 @@ export class UsersService {
     }
 
     async update(updateUserDto: UpdateUserDto, user: IUser) {
+        const {
+            streetAddress,
+            latitude,
+            longitude,
+            provinceCode,
+            districtCode,
+            wardCode,
+            provinceName,
+            districtName,
+            wardName,
+        } = updateUserDto;
         return await this.userModel.updateOne(
             { _id: updateUserDto._id },
             {
                 ...updateUserDto,
+                address: {
+                    streetAddress,
+                    latitude,
+                    longitude,
+                    provinceCode,
+                    districtCode,
+                    wardCode,
+                    provinceName,
+                    districtName,
+                    wardName,
+                },
                 updatedBy: user._id,
             },
         );

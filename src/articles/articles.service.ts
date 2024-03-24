@@ -9,12 +9,18 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article, ArticleDocument } from './schemas/article.schema';
 import { CreateVerificationDto } from 'src/verification/dto/create-verification.dto';
+import {
+    Verification,
+    VerificationDocument,
+} from 'src/verification/schemas/verification.schema';
 
 @Injectable()
 export class ArticlesService {
     constructor(
         @InjectModel(Article.name)
         private articleModel: SoftDeleteModel<ArticleDocument>,
+        @InjectModel(Verification.name)
+        private verificationModel: SoftDeleteModel<VerificationDocument>,
         private commentService: CommentsService,
     ) {}
 
@@ -95,11 +101,24 @@ export class ArticlesService {
             .populate({
                 path: 'categoryId',
                 select: { name: 1 },
-            });
+            })
+            .lean();
+
+        const verificationResult = await this.verificationModel
+            .find({ articleId: article._id })
+            .sort({ createdBy: -1 })
+            .limit(1);
+
         const comments = await this.commentService.findAllByArticleId(
             article._id.toString(),
         );
-        return { article, comments };
+        return {
+            article: {
+                ...article,
+                verificationStatus: verificationResult[0].status,
+            },
+            comments,
+        };
     }
 
     update(_id: string, updateArticleDto: UpdateArticleDto, user: IUser) {

@@ -22,10 +22,8 @@ export class CreateUserDto {
     @ApiProperty({ required: false })
     avatar: string;
 
-    // @IsNotEmpty()
-    // @MinLength(10)
     @ApiProperty({ required: false })
-    @IsPhoneNumber()
+    @IsPhoneNumber('VN')
     phone: string;
 
     @ApiProperty({ required: false })

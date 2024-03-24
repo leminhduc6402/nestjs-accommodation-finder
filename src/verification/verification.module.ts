@@ -19,6 +19,6 @@ import { Article, ArticleSchema } from 'src/articles/schemas/article.schema';
     ],
     controllers: [VerificationController],
     providers: [VerificationService],
-    exports: [VerificationService]
+    exports: [VerificationService],
 })
 export class VerificationModule {}

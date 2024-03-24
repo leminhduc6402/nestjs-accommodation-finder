@@ -3,6 +3,7 @@ import {
     ForbiddenException,
     Inject,
     Injectable,
+    UnprocessableEntityException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
@@ -76,6 +77,7 @@ export class AuthService {
             email,
             fullName,
             avatar,
+            phone,
             followers,
             followings,
             role,
@@ -106,12 +108,12 @@ export class AuthService {
         response.status(200);
         return {
             access_token: this.jwtService.sign(payload),
-            // refresh_token,
             user: {
                 _id,
                 fullName,
                 email,
                 avatar,
+                phone,
                 followers,
                 followings,
                 role,
@@ -205,12 +207,13 @@ export class AuthService {
 
     verify = async (verifyDto: VerifyDto) => {
         const { email, passcode } = verifyDto;
-        const a = await this.mailService.getPasscode(email);
-        if (passcode === a) {
-            await this.usersService.verifyUser(email);
-            await this.cacheManager.del(email);
-            return true;
+        const passcodeCache = await this.mailService.getPasscode(email);
+        console.log(email, passcode, passcodeCache);
+        if (passcode !== passcodeCache) {
+            throw new UnprocessableEntityException();
         }
-        return false;
+        await this.usersService.verifyUser(email);
+        await this.cacheManager.del(email);
+        return true;
     };
 }

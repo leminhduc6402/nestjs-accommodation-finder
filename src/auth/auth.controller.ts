@@ -116,6 +116,7 @@ export class AuthController {
 
     @Public()
     @ResponseMessage('Verify account')
+    @ApiOperation({ summary: 'Verify user by passcode' })
     @ApiBody({ type: VerifyDto })
     @Post('verify')
     async verifyAccount(@Body() verifyDto: VerifyDto) {

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateArticleDto {
@@ -16,6 +17,8 @@ export class CreateArticleDto {
 
     @IsNotEmpty()
     acreage: number;
+
+    status: string;
 
     @IsNotEmpty()
     quantity: number;
@@ -50,4 +53,35 @@ export class CreateArticleDto {
     @IsNotEmpty()
     @IsArray()
     images: string[];
+}
+export class ArticleQueryString {
+    @ApiProperty({ required: false })
+    categoryId: string;
+
+    @ApiProperty({ required: false })
+    title: string;
+
+    @ApiProperty({ required: false })
+    price: number;
+
+    @ApiProperty({ required: false })
+    acreage: number;
+
+    @ApiProperty({ required: false })
+    quantity: number;
+
+    @ApiProperty({ required: false })
+    status: string;
+
+    @ApiProperty({ required: false })
+    streetAddress: string;
+
+    @ApiProperty({ required: false })
+    provinceCode: number;
+
+    @ApiProperty({ required: false })
+    districtCode: number;
+
+    @ApiProperty({ required: false })
+    wardCode: number;
 }

@@ -1,25 +1,27 @@
 import {
-    Controller,
-    Get,
-    Post,
     Body,
-    Patch,
-    Param,
+    Controller,
     Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
     Query,
+    UseGuards,
 } from '@nestjs/common';
-import { ArticlesService } from './articles.service';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IUser } from 'src/users/users.interface';
-import { CreateVerificationDto } from 'src/verification/dto/create-verification.dto';
+import { ArticlesService } from './articles.service';
+import { ArticleQueryString, CreateArticleDto } from './dto/create-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
     constructor(private readonly articlesService: ArticlesService) {}
 
+    @UseGuards(ThrottlerGuard)
     @ApiOperation({ summary: 'Create an article' })
     @ResponseMessage('Create an article')
     @Post()
@@ -28,6 +30,7 @@ export class ArticlesController {
     }
 
     @Public()
+    @ApiQuery({ type: ArticleQueryString })
     @ApiOperation({ summary: 'Get all article with pagination' })
     @ResponseMessage('fetch article with pagination')
     @Get()
