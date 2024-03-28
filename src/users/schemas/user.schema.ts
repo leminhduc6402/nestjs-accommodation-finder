@@ -31,9 +31,9 @@ export class User {
     streetAddress: string;
     latitude: number;
     longitude: number;
-    provinceCode: number;
-    districtCode: number;
-    wardCode: number;
+    provinceCode: string;
+    districtCode: string;
+    wardCode: string;
     provinceName: string;
     districtName: string;
     wardName: string;

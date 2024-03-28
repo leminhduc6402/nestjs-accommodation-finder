@@ -13,31 +13,39 @@ export class MailService {
         private cacheManager: Cache,
     ) {}
     async sendPasscode(sendMailDto: SendMailDto, template: string) {
-        const { email } = sendMailDto;
-        const passcode = await otpGenerator.generate(6, {
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets: false,
-            specialChars: false,
-            digits: true,
-        });
+        try {
+            const { email } = sendMailDto;
+            const passcode = await otpGenerator.generate(6, {
+                upperCaseAlphabets: false,
+                lowerCaseAlphabets: false,
+                specialChars: false,
+                digits: true,
+            });
 
-        await this.cacheManager.set(email, passcode);
+            await this.cacheManager.set(email, passcode);
 
-        await this.mailerService.sendMail({
-            to: email,
-            from: '"Support Team" <support@example.com>',
-            subject: 'Welcome to Nice App! Confirm your Email',
-            template: template,
-            context: {
-                passcode,
-            },
-        });
+            await this.mailerService.sendMail({
+                to: email,
+                from: '"Support Team" <support@example.com>',
+                subject: 'Welcome to Nice App! Confirm your Email',
+                template: template,
+                context: {
+                    passcode,
+                },
+            });
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
     async getPasscode(email: string) {
-        const passcode = await this.cacheManager.get(email);
-        if (!passcode) {
-            throw new NotFoundException()
+        try {
+            const passcode = await this.cacheManager.get(email);
+            if (!passcode) {
+                throw new NotFoundException();
+            }
+            return passcode;
+        } catch (error) {
+            throw new Error(error.message);
         }
-        return passcode;
     }
 }

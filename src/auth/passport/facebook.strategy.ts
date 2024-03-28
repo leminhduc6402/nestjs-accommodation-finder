@@ -30,9 +30,6 @@ export class FacebookStrategy extends PassportStrategy(Strategy) {
             profile.displayName,
             pictureUrl,
         );
-        console.log('profile: ', profile);
-        console.log('accessToken: ', accessToken);
-        console.log('refreshToken: ', refreshToken);
         return user;
     }
 }
