@@ -6,6 +6,7 @@ import {
     Patch,
     Param,
     Delete,
+    Query,
 } from '@nestjs/common';
 import { VerificationService } from './verification.service';
 import { CreateVerificationDto } from './dto/create-verification.dto';
@@ -27,9 +28,19 @@ export class VerificationController {
         return this.verificationService.create(createVerificationDto, user);
     }
 
-    @Get()
-    findAll() {
-        return this.verificationService.findAll();
+    @Get(':id')
+    async findAll(
+        @Param('id') id: string,
+        @Query('current') currentPage: string,
+        @Query('pageSize') limit: string,
+        @Query() qs: string,
+    ) {
+        return await this.verificationService.findAllByArticleId(
+            id,
+            +currentPage,
+            +limit,
+            qs,
+        );
     }
 
     @Public()

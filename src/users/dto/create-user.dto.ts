@@ -44,13 +44,13 @@ export class CreateUserDto {
     longitude: number;
 
     @ApiProperty({ required: false })
-    provinceCode: number;
+    provinceCode: string;
 
     @ApiProperty({ required: false })
-    districtCode: number;
+    districtCode: string;
 
     @ApiProperty({ required: false })
-    wardCode: number;
+    wardCode: string;
 
     @ApiProperty({ required: false })
     provinceName: string;

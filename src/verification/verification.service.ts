@@ -14,64 +14,100 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import { Article, ArticleDocument } from 'src/articles/schemas/article.schema';
 import { ArticlesService } from 'src/articles/articles.service';
+import aqp from 'api-query-params';
 
 @Injectable()
 export class VerificationService {
     constructor(
         @InjectModel(Verification.name)
         private verificationModel: SoftDeleteModel<VerificationDocument>,
-        @InjectModel(Article.name)
-        private articleModel: SoftDeleteModel<ArticleDocument>,
         private articleService: ArticlesService,
     ) {}
 
     async create(createVerificationDto: CreateVerificationDto, user: IUser) {
-        const { articleId } = createVerificationDto;
-        const isExistArticle = await this.articleModel.findOne({
-            _id: articleId,
-        });
-        if (!isExistArticle) {
-            throw new NotFoundException('Not Found Article');
-        }
-        const isExistVerification = await this.verificationModel.findOne({
-            articleId,
-        });
-        if (isExistVerification) {
-            throw new BadRequestException('The verification already exists');
-        }
-
-        await this.articleModel.findOneAndUpdate(
-            { _id: articleId },
-            {
+        try {
+            const { articleId } = createVerificationDto;
+            const isExistVerification = await this.verificationModel.findOne({
+                articleId,
                 status: 'PENDING',
-                updatedBy: user._id,
-            },
-        );
-        return await this.verificationModel.create({
-            ...createVerificationDto,
-            createdBy: user._id,
-        });
+            });
+            if (isExistVerification) {
+                throw new BadRequestException();
+            }
+
+            return await this.verificationModel.create({
+                ...createVerificationDto,
+                status: 'PENDING',
+                createdBy: user._id,
+            });
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
-    findAll() {
-        return `This action returns all verification`;
+    async findAllByArticleId(
+        id: string,
+        currentPage: number,
+        limit: number,
+        qs: string,
+    ) {
+        try {
+            const { filter, sort, population, projection } = aqp(qs);
+            delete filter.current;
+            delete filter.pageSize;
+
+            let offset = (+currentPage - 1) * +limit;
+            let defaultLimit = +limit ? +limit : 10;
+            const totalItems = (await this.verificationModel.find(filter))
+                .length;
+            const totalPages = Math.ceil(totalItems / defaultLimit);
+
+            const results = await this.verificationModel
+                .find(filter)
+                .skip(offset)
+                .limit(defaultLimit)
+                .sort(sort as any)
+                .select(projection)
+                .populate(population)
+                .exec();
+
+            return {
+                meta: {
+                    current: currentPage,
+                    pageSize: limit,
+                    pages: totalPages,
+                    total: totalItems,
+                },
+                results,
+            };
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
     findOne(id: string) {
-        return this.verificationModel
-            .findById(id)
-            .populate({ path: 'articleId' });
+        try {
+            return this.verificationModel
+                .findById(id)
+                .populate({ path: 'articleId' });
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
     async update(id: string, status: string, user: IUser) {
-        const verification = await this.verificationModel.findById(id);
-        const { articleId } = verification;
-        const article = await this.articleService.update(
-            articleId.toString(),
-            { status },
-            user,
-        );
-        return article;
+        try {
+            const verification = await this.verificationModel.findById(id);
+            const { articleId } = verification;
+            const article = await this.articleService.update(
+                articleId.toString(),
+                { status },
+                user,
+            );
+            return article;
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
     remove(id: number) {

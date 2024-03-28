@@ -32,20 +32,24 @@ export class AuthService {
     ) {}
 
     async validateUser(email: string, pass: string): Promise<any> {
-        const user = await this.usersService.findOneByEmail(email);
-        if (user) {
-            if (user.active === false) {
-                throw new ForbiddenException();
+        try {
+            const user = await this.usersService.findOneByEmail(email);
+            if (user) {
+                if (user.active === false) {
+                    throw new ForbiddenException();
+                }
+                const isValid = this.usersService.isValidPassword(
+                    pass,
+                    user.password,
+                );
+                if (isValid === true) {
+                    return user;
+                }
             }
-            const isValid = this.usersService.isValidPassword(
-                pass,
-                user.password,
-            );
-            if (isValid === true) {
-                return user;
-            }
+            return null;
+        } catch (error) {
+            throw new Error(error.message);
         }
-        return null;
     }
 
     async validateUserWithSocial(
@@ -53,80 +57,99 @@ export class AuthService {
         fullName: string,
         avatar: string,
     ): Promise<any> {
-        const user = await this.usersService.findOneByEmail(email);
-        if (user) {
-            return user;
+        try {
+            const user = await this.usersService.findOneByEmail(email);
+            if (user) {
+                return user;
+            }
+            const userLoginWithGGDto: UserLoginWithGGDto = {
+                email,
+                fullName,
+                avatar,
+            };
+            const newUser =
+                await this.usersService.registerBySocialAccount(
+                    userLoginWithGGDto,
+                );
+            return newUser;
+        } catch (error) {
+            throw new Error(error.message);
         }
-        const userLoginWithGGDto: UserLoginWithGGDto = {
-            email,
-            fullName,
-            avatar,
-        };
-        const newUser =
-            await this.usersService.registerBySocialAccount(userLoginWithGGDto);
-        return newUser;
     }
 
     async findUserByEmail(email: string) {
-        return await this.usersService.findOneByEmail(email);
+        try {
+            return await this.usersService.findOneByEmail(email);
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
     async login(user: IUser, response: Response) {
-        const {
-            _id,
-            email,
-            fullName,
-            avatar,
-            phone,
-            followers,
-            followings,
-            role,
-            // , permissions
-        } = user;
-
-        const payload = {
-            sub: 'token login',
-            iss: 'from server',
-            _id,
-            fullName,
-            email,
-            avatar,
-            role,
-        };
-        const refresh_token = this.createRefreshToken(payload);
-
-        //update user with refresh token
-        await this.usersService.updateUserToken(refresh_token, _id);
-
-        // set refresh_token as cookies
-        response.cookie('refresh_token', refresh_token, {
-            httpOnly: true,
-            maxAge: ms(this.configService.get<string>('JWT_REFRESH_EXPIRE')),
-            sameSite: 'none',
-            secure: true,
-        });
-        response.status(200);
-        return {
-            access_token: this.jwtService.sign(payload),
-            user: {
+        try {
+            const {
                 _id,
-                fullName,
                 email,
+                fullName,
                 avatar,
                 phone,
                 followers,
                 followings,
                 role,
-                // permissions,
-            },
-        };
+                // , permissions
+            } = user;
+
+            const payload = {
+                sub: 'token login',
+                iss: 'from server',
+                _id,
+                fullName,
+                email,
+                avatar,
+                role,
+            };
+            const refresh_token = this.createRefreshToken(payload);
+
+            //update user with refresh token
+            await this.usersService.updateUserToken(refresh_token, _id);
+
+            // set refresh_token as cookies
+            response.cookie('refresh_token', refresh_token, {
+                httpOnly: true,
+                maxAge: ms(
+                    this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+                ),
+                sameSite: 'none',
+                secure: true,
+            });
+            response.status(200);
+            return {
+                access_token: this.jwtService.sign(payload),
+                user: {
+                    _id,
+                    fullName,
+                    email,
+                    avatar,
+                    phone,
+                    followers,
+                    followings,
+                    role,
+                    // permissions,
+                },
+            };
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
-    //tạo user database
     async register(registerUserDto: RegisterUserDto) {
-        const newUser = await this.usersService.register(registerUserDto);
+        try {
+            const newUser = await this.usersService.register(registerUserDto);
 
-        return newUser;
+            return newUser;
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
     createRefreshToken = (payload: any) => {
@@ -200,20 +223,28 @@ export class AuthService {
     };
 
     logout = async (response: Response, user: IUser) => {
-        await this.usersService.updateUserToken('', user._id);
-        response.clearCookie('refresh_token');
-        return 'Logout success';
+        try {
+            await this.usersService.updateUserToken('', user._id);
+            response.clearCookie('refresh_token');
+            return 'Logout success';
+        } catch (error) {
+            throw new Error(error.message);
+        }
     };
 
     verify = async (verifyDto: VerifyDto) => {
-        const { email, passcode } = verifyDto;
-        const passcodeCache = await this.mailService.getPasscode(email);
-        console.log(email, passcode, passcodeCache);
-        if (passcode !== passcodeCache) {
-            throw new UnprocessableEntityException();
+        try {
+            const { email, passcode } = verifyDto;
+            const passcodeCache = await this.mailService.getPasscode(email);
+
+            if (passcode !== passcodeCache) {
+                throw new UnprocessableEntityException();
+            }
+            await this.usersService.verifyUser(email);
+            await this.cacheManager.del(email);
+            return true;
+        } catch (error) {
+            throw new Error(error.message);
         }
-        await this.usersService.verifyUser(email);
-        await this.cacheManager.del(email);
-        return true;
     };
 }

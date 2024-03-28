@@ -40,9 +40,9 @@ export class Article {
     @Prop({ type: Object })
     address: {
         streetAddress: string;
-        provinceCode: number;
-        districtCode: number;
-        wardCode: number;
+        provinceCode: string;
+        districtCode: string;
+        wardCode: string;
         provinceName: string;
         districtName: string;
         wardName: string;
