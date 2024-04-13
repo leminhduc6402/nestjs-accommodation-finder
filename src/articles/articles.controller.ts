@@ -79,10 +79,10 @@ export class ArticlesController {
         return this.articlesService.findByLocation(+longitude, +latitude);
     }
 
-    @ApiOperation({ summary: 'Verify the article' })
-    @ResponseMessage('Verify the article')
-    @Patch('verify/:id')
-    verify(@Param('id') id: string, @User() user: IUser) {
-        return this.articlesService.verify(id, user);
-    }
+    // @ApiOperation({ summary: 'Verify the article' })
+    // @ResponseMessage('Verify the article')
+    // @Patch('verify/:id')
+    // verify(@Param('id') id: string, @User() user: IUser) {
+    //     return this.articlesService.verify(id, user);
+    // }
 }

@@ -2,13 +2,13 @@ import { IsMongoId, IsNotEmpty } from 'class-validator';
 
 export class CreateVerificationDto {
     @IsNotEmpty()
-    personalIdImage: string;
+    personalIdImage: string[];
 
     @IsNotEmpty()
-    latedImage: string;
+    latedImage: string[];
 
     @IsNotEmpty()
-    contract: string;
+    contract: string[];
 
     @IsNotEmpty()
     video: string;

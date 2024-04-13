@@ -99,12 +99,31 @@ export class VerificationService {
         try {
             const verification = await this.verificationModel.findById(id);
             const { articleId } = verification;
-            const article = await this.articleService.update(
+            const article = await this.articleService.findOne(articleId + '');
+            if (!verification || !article) {
+                throw new NotFoundException();
+            }
+            if (
+                verification.status === 'SUCCESS' &&
+                article.article.status === 'VERIFY'
+            ) {
+                throw new BadRequestException();
+            }
+            if (
+                verification.status === 'PENDING' &&
+                article.article.status === 'UNVERIFY'
+            ) {
+                throw new BadRequestException();
+            }
+            await this.articleService.update(
                 articleId.toString(),
                 { status },
                 user,
             );
-            return article;
+            return await this.verificationModel.findOneAndUpdate(
+                { _id: id },
+                { status },
+            );
         } catch (error) {
             throw new Error(error.message);
         }

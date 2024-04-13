@@ -9,5 +9,24 @@ export class VerifyDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    passcode: number
+    passcode: number;
+}
+
+export class ChangePassword {
+    @ApiProperty()
+    @IsNotEmpty()
+    newPassword: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    reNewPassword: string;
+}
+export class ForgotPassword {
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    newPassword: string;
 }

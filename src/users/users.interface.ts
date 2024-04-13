@@ -5,14 +5,14 @@ export interface IUser {
     fullName: string;
     email: string;
     avatar: string;
-    phone: string;
+    phone?: string;
     role: string;
-    followers: {
+    followers?: {
         _id: string;
         fullName: string;
         avatar: string;
     }[];
-    followings: {
+    followings?: {
         _id: string;
         fullName: string;
         avatar: string;
