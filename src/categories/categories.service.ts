@@ -16,107 +16,87 @@ export class CategoriesService {
     ) {}
 
     async create(createCategoryDto: CreateCategoryDto, user: IUser) {
-        try {
-            const { name } = createCategoryDto;
-            const isExist = await this.categoryModel.findOne({ name });
-            if (isExist) {
-                throw new BadRequestException(`Name: ${name} already exists`);
-            }
-            const category = await this.categoryModel.create({
-                ...createCategoryDto,
-                createdBy: user._id,
-            });
-            return category;
-        } catch (error) {
-            throw new Error(error.message);
+        const { name } = createCategoryDto;
+        const isExist = await this.categoryModel.findOne({ name });
+        if (isExist) {
+            throw new BadRequestException(`Name: ${name} already exists`);
         }
+        const category = await this.categoryModel.create({
+            ...createCategoryDto,
+            createdBy: user._id,
+        });
+        return category;
     }
 
     async findAll(currentPage: number, limit: number, qs: string) {
-        try {
-            const { filter, sort, population, projection } = aqp(qs);
-            delete filter.current;
-            delete filter.pageSize;
+        const { filter, sort, population, projection } = aqp(qs);
+        delete filter.current;
+        delete filter.pageSize;
 
-            let offset = (+currentPage - 1) * +limit;
-            let defaultLimit = +limit ? +limit : 10;
-            const totalItems = (await this.categoryModel.find(filter)).length;
-            const totalPages = Math.ceil(totalItems / defaultLimit);
+        let offset = (+currentPage - 1) * +limit;
+        let defaultLimit = +limit ? +limit : 10;
+        const totalItems = (await this.categoryModel.find(filter)).length;
+        const totalPages = Math.ceil(totalItems / defaultLimit);
 
-            const results = await this.categoryModel
-                .find(filter)
-                .select(projection)
-                .skip(offset)
-                .limit(defaultLimit)
-                .sort(sort as any)
-                .populate({
-                    ...population,
-                    path: 'createdBy updatedBy',
-                    select: { fullName: 1, avatar: 1, email: 1, role: 1 },
-                })
-                .exec();
+        const results = await this.categoryModel
+            .find(filter)
+            .select(projection)
+            .skip(offset)
+            .limit(defaultLimit)
+            .sort(sort as any)
+            .populate({
+                ...population,
+                path: 'createdBy updatedBy',
+                select: { fullName: 1, avatar: 1, email: 1, role: 1 },
+            })
+            .exec();
 
-            return {
-                meta: {
-                    current: currentPage, //trang hiện tại
-                    pageSize: limit, //số lượng bản ghi đã lấy
-                    pages: totalPages, //tổng số trang với điều kiện query
-                    total: totalItems, // tổng số phần tử (số bản ghi)
-                },
-                results, //kết quả query
-            };
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return {
+            meta: {
+                current: currentPage, //trang hiện tại
+                pageSize: limit, //số lượng bản ghi đã lấy
+                pages: totalPages, //tổng số trang với điều kiện query
+                total: totalItems, // tổng số phần tử (số bản ghi)
+            },
+            results, //kết quả query
+        };
     }
 
     async findOne(id: string) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new BadRequestException('Not found category with id');
-            }
-            return await this.categoryModel.findById(id).populate({
-                path: 'createdBy',
-                select: { fullName: 1, avatar: 1 },
-            });
-        } catch (error) {
-            throw new Error(error.message);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new BadRequestException('Not found category with id');
         }
+        return await this.categoryModel.findById(id).populate({
+            path: 'createdBy',
+            select: { fullName: 1, avatar: 1 },
+        });
     }
 
     update(_id: string, updateCategoryDto: UpdateCategoryDto, user: IUser) {
-        try {
-            return this.categoryModel.updateOne(
-                {
-                    _id,
-                },
-                {
-                    ...updateCategoryDto,
-                    updatedBy: user._id,
-                },
-            );
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return this.categoryModel.updateOne(
+            {
+                _id,
+            },
+            {
+                ...updateCategoryDto,
+                updatedBy: user._id,
+            },
+        );
     }
 
     async remove(id: string, user: IUser) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                return 'Cannot found this article';
-            }
-            await this.categoryModel.updateOne(
-                { _id: id },
-                {
-                    deletedBy: {
-                        _id: user._id,
-                        email: user.email,
-                    },
-                },
-            );
-            return this.categoryModel.softDelete({ _id: id });
-        } catch (error) {
-            throw new Error(error.message);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return 'Cannot found this article';
         }
+        await this.categoryModel.updateOne(
+            { _id: id },
+            {
+                deletedBy: {
+                    _id: user._id,
+                    email: user.email,
+                },
+            },
+        );
+        return this.categoryModel.softDelete({ _id: id });
     }
 }

@@ -31,35 +31,34 @@ export class CreateUserDto {
     role: string;
 
     @ApiProperty()
-    @IsNotEmpty()
-    active: boolean;
+    active?: boolean;
 
     @ApiProperty({ required: false })
-    streetAddress: string;
+    streetAddress?: string;
 
     @ApiProperty({ required: false })
-    latitude: number;
+    latitude?: number;
 
     @ApiProperty({ required: false })
-    longitude: number;
+    longitude?: number;
 
     @ApiProperty({ required: false })
-    provinceCode: string;
+    provinceCode?: string;
 
     @ApiProperty({ required: false })
-    districtCode: string;
+    districtCode?: string;
 
     @ApiProperty({ required: false })
-    wardCode: string;
+    wardCode?: string;
 
     @ApiProperty({ required: false })
-    provinceName: string;
+    provinceName?: string;
 
     @ApiProperty({ required: false })
-    districtName: string;
+    districtName?: string;
 
     @ApiProperty({ required: false })
-    wardName: string;
+    wardName?: string;
 }
 
 export class RegisterUserDto {
