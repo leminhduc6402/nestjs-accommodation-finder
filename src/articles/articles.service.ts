@@ -67,153 +67,129 @@ export class ArticlesService {
     }
 
     async findAll(currentPage: number, limit: number, qs: string) {
-        try {
-            const { filter, sort, population, projection } = aqp(qs);
-            delete filter.current;
-            delete filter.pageSize;
+        const { filter, sort, population, projection } = aqp(qs);
+        delete filter.current;
+        delete filter.pageSize;
 
-            let offset = (+currentPage - 1) * +limit;
-            let defaultLimit = +limit ? +limit : 10;
-            const totalItems = (await this.articleModel.find(filter)).length;
-            const totalPages = Math.ceil(totalItems / defaultLimit);
+        let offset = (+currentPage - 1) * +limit;
+        let defaultLimit = +limit ? +limit : 10;
+        const totalItems = (await this.articleModel.find(filter)).length;
+        const totalPages = Math.ceil(totalItems / defaultLimit);
 
-            const results = await this.articleModel
-                .find(filter)
-                .skip(offset)
-                .limit(defaultLimit)
-                .sort(sort as any)
-                .select(projection)
-                .populate(population)
-                .exec();
+        const results = await this.articleModel
+            .find(filter)
+            .skip(offset)
+            .limit(defaultLimit)
+            .sort(sort as any)
+            .select(projection)
+            .populate(population)
+            .exec();
 
-            return {
-                meta: {
-                    current: currentPage,
-                    pageSize: limit,
-                    pages: totalPages,
-                    total: totalItems,
-                },
-                results,
-            };
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return {
+            meta: {
+                current: currentPage,
+                pageSize: limit,
+                pages: totalPages,
+                total: totalItems,
+            },
+            results,
+        };
     }
 
     async findOne(id: string) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new BadRequestException('Not found article with id');
-            }
-            const article = await this.articleModel
-                .findById(id)
-                .populate({
-                    path: 'createdBy updatedBy',
-                    select: 'fullName email phone avatar name',
-                })
-                .populate({
-                    path: 'categoryId',
-                    select: { name: 1 },
-                })
-                .lean();
-
-            const verificationResult = await this.verificationModel
-                .find({ articleId: article._id })
-                .sort({ createdBy: -1 })
-                .limit(1);
-
-            const comments = await this.commentService.findAllByArticleId(
-                article._id.toString(),
-            );
-            return {
-                article: {
-                    ...article,
-                    verificationStatus:
-                        verificationResult.length !== 0
-                            ? verificationResult[0].status
-                            : null,
-                },
-                comments,
-            };
-        } catch (error) {
-            throw new Error(error.message);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new BadRequestException('Not found article with id');
         }
+        const article = await this.articleModel
+            .findById(id)
+            .populate({
+                path: 'createdBy updatedBy',
+                select: 'fullName email phone avatar name',
+            })
+            .populate({
+                path: 'categoryId',
+                select: { name: 1 },
+            })
+            .lean();
+
+        const verificationResult = await this.verificationModel
+            .find({ articleId: article._id })
+            .sort({ createdBy: -1 })
+            .limit(1);
+
+        const comments = await this.commentService.findAllByArticleId(
+            article._id.toString(),
+        );
+        return {
+            article: {
+                ...article,
+                verificationStatus:
+                    verificationResult.length !== 0
+                        ? verificationResult[0].status
+                        : null,
+            },
+            comments,
+        };
     }
 
     update(_id: string, updateArticleDto: UpdateArticleDto, user: IUser) {
-        try {
-            return this.articleModel.updateOne(
-                {
-                    _id,
-                },
-                {
-                    ...updateArticleDto,
-                    updatedBy: user._id,
-                },
-            );
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return this.articleModel.updateOne(
+            {
+                _id,
+            },
+            {
+                ...updateArticleDto,
+                updatedBy: user._id,
+            },
+        );
     }
 
     async remove(id: string, user: IUser) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                return 'Cannot found this article';
-            }
-            await this.articleModel.updateOne(
-                { _id: id },
-                {
-                    deletedBy: {
-                        _id: user._id,
-                        email: user.email,
-                    },
-                },
-            );
-            return this.articleModel.softDelete({ _id: id });
-        } catch (error) {
-            throw new Error(error.message);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return 'Cannot found this article';
         }
+        await this.articleModel.updateOne(
+            { _id: id },
+            {
+                deletedBy: {
+                    _id: user._id,
+                    email: user.email,
+                },
+            },
+        );
+        return this.articleModel.softDelete({ _id: id });
     }
 
     async findByLocation(longitude: number, latitude: number) {
-        try {
-            const articles = await this.articleModel.find({
-                location: {
-                    $near: {
-                        $geometry: {
-                            type: 'Point',
-                            coordinates: [longitude, latitude],
-                        },
-                        $maxDistance: 3000, // 3km
+        const articles = await this.articleModel.find({
+            location: {
+                $near: {
+                    $geometry: {
+                        type: 'Point',
+                        coordinates: [longitude, latitude],
                     },
+                    $maxDistance: 3000, // 3km
                 },
-            });
-            return articles;
-        } catch (error) {
-            throw new Error(error.message);
-        }
+            },
+        });
+        return articles;
     }
 
     verify(_id: string, user: IUser) {
-        try {
-            const expirationDate = new Date();
-            expirationDate.setMonth(expirationDate.getMonth() + 1);
+        const expirationDate = new Date();
+        expirationDate.setMonth(expirationDate.getMonth() + 1);
 
-            return this.articleModel.updateOne(
-                {
-                    _id,
-                },
-                {
-                    status: 'VERIFY',
-                    expiredAt: expirationDate.setMonth(
-                        expirationDate.getMonth() + 1,
-                    ),
-                    updatedBy: user._id,
-                },
-            );
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return this.articleModel.updateOne(
+            {
+                _id,
+            },
+            {
+                status: 'VERIFY',
+                expiredAt: expirationDate.setMonth(
+                    expirationDate.getMonth() + 1,
+                ),
+                updatedBy: user._id,
+            },
+        );
     }
 }

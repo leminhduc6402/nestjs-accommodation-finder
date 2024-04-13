@@ -14,6 +14,7 @@ import { FollowModule } from './follow/follow.module';
 import { MailModule } from './mail/mail.module';
 import { VerificationModule } from './verification/verification.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { LandlordRequestModule } from './landlord-request/landlord-request.module';
 @Module({
     imports: [
         ThrottlerModule.forRoot([
@@ -45,6 +46,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         FollowModule,
         MailModule,
         VerificationModule,
+        LandlordRequestModule,
     ],
     controllers: [AppController],
     providers: [AppService],

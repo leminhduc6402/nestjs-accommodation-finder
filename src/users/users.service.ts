@@ -203,6 +203,12 @@ export class UsersService {
 
     async update(updateUserDto: UpdateUserDto, user: IUser) {
         const {
+            active,
+            avatar,
+            email,
+            fullName,
+            phone,
+            role,
             streetAddress,
             latitude,
             longitude,
@@ -213,23 +219,49 @@ export class UsersService {
             districtName,
             wardName,
         } = updateUserDto;
+
+        // Tạo một đối tượng chỉ chứa các trường được cung cấp trong `updateUserDto`
+        const updateFields: any = {
+            active,
+            avatar,
+            email,
+            fullName,
+            phone,
+            role,
+            updatedBy: user._id,
+        };
+
+        if (streetAddress !== null && streetAddress !== undefined) {
+            updateFields.address = { ...updateFields.address, streetAddress };
+        }
+        if (latitude !== null && latitude !== undefined) {
+            updateFields.address = { ...updateFields.address, latitude };
+        }
+        if (longitude !== null && longitude !== undefined) {
+            updateFields.address = { ...updateFields.address, longitude };
+        }
+        if (provinceCode !== null && provinceCode !== undefined) {
+            updateFields.address = { ...updateFields.address, provinceCode };
+        }
+        if (districtCode !== null && districtCode !== undefined) {
+            updateFields.address = { ...updateFields.address, districtCode };
+        }
+        if (wardCode !== null && wardCode !== undefined) {
+            updateFields.address = { ...updateFields.address, wardCode };
+        }
+        if (provinceName !== null && provinceName !== undefined) {
+            updateFields.address = { ...updateFields.address, provinceName };
+        }
+        if (districtName !== null && districtName !== undefined) {
+            updateFields.address = { ...updateFields.address, districtName };
+        }
+        if (wardName !== null && wardName !== undefined) {
+            updateFields.address = { ...updateFields.address, wardName };
+        }
+
         return await this.userModel.updateOne(
             { _id: updateUserDto._id },
-            {
-                ...updateUserDto,
-                address: {
-                    streetAddress,
-                    latitude,
-                    longitude,
-                    provinceCode,
-                    districtCode,
-                    wardCode,
-                    provinceName,
-                    districtName,
-                    wardName,
-                },
-                updatedBy: user._id,
-            },
+            updateFields,
         );
     }
 

@@ -34,95 +34,83 @@ export class FilesService {
     });
 
     async upload(file: Express.Multer.File, user: IUser) {
-        try {
-            const key = `${uuidv4()}-${file.originalname}`;
-            const result = await this.s3Client.send(
-                new PutObjectCommand({
-                    Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
-                    Key: key,
-                    Body: file.buffer,
-                    ACL: 'public-read',
-                    ContentType: file.mimetype,
-                }),
+        const key = `${uuidv4()}-${file.originalname}`;
+        const result = await this.s3Client.send(
+            new PutObjectCommand({
+                Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+                Key: key,
+                Body: file.buffer,
+                ACL: 'public-read',
+                ContentType: file.mimetype,
+            }),
+        );
+        if (result.$metadata.httpStatusCode !== 200) {
+            throw new BadRequestException(
+                'Something wrong when upload file!!!',
             );
-            if (result.$metadata.httpStatusCode !== 200) {
-                throw new BadRequestException(
-                    'Something wrong when upload file!!!',
-                );
-            }
-
-            const fileInfo = await this.fileModel.create({
-                name: key,
-                mimeType: file.mimetype,
-                size: file.size,
-                path: `https://${this.configService.get(
-                    'AWS_PUBLIC_BUCKET_NAME',
-                )}.s3.amazonaws.com/${key}`,
-                createdBy: user._id,
-            });
-            return { path: fileInfo.path };
-        } catch (error) {
-            throw new Error(error.message);
         }
+
+        const fileInfo = await this.fileModel.create({
+            name: key,
+            mimeType: file.mimetype,
+            size: file.size,
+            path: `https://${this.configService.get(
+                'AWS_PUBLIC_BUCKET_NAME',
+            )}.s3.amazonaws.com/${key}`,
+            createdBy: user._id,
+        });
+        return { path: fileInfo.path };
     }
 
     async findAll(currentPage: number, limit: number, qs: string) {
-        try {
-            const { filter, sort, population, projection } = aqp(qs);
-            delete filter.current;
-            delete filter.pageSize;
+        const { filter, sort, population, projection } = aqp(qs);
+        delete filter.current;
+        delete filter.pageSize;
 
-            let offset = (+currentPage - 1) * +limit;
-            let defaultLimit = +limit ? +limit : 10;
-            const totalItems = (await this.fileModel.find(filter)).length;
-            const totalPages = Math.ceil(totalItems / defaultLimit);
+        let offset = (+currentPage - 1) * +limit;
+        let defaultLimit = +limit ? +limit : 10;
+        const totalItems = (await this.fileModel.find(filter)).length;
+        const totalPages = Math.ceil(totalItems / defaultLimit);
 
-            const results = await this.fileModel
-                .find(filter)
-                .skip(offset)
-                .limit(defaultLimit)
-                .sort(sort as any)
-                .select(projection)
-                .populate(population)
-                .exec();
-            return {
-                meta: {
-                    current: currentPage, //trang hiện tại
-                    pageSize: limit, //số lượng bản ghi đã lấy
-                    pages: totalPages, //tổng số trang với điều kiện query
-                    total: totalItems, // tổng số phần tử (số bản ghi)
-                },
-                results, //kết quả query
-            };
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        const results = await this.fileModel
+            .find(filter)
+            .skip(offset)
+            .limit(defaultLimit)
+            .sort(sort as any)
+            .select(projection)
+            .populate(population)
+            .exec();
+        return {
+            meta: {
+                current: currentPage, //trang hiện tại
+                pageSize: limit, //số lượng bản ghi đã lấy
+                pages: totalPages, //tổng số trang với điều kiện query
+                total: totalItems, // tổng số phần tử (số bản ghi)
+            },
+            results, //kết quả query
+        };
     }
 
     async remove(key: string, user: IUser) {
-        try {
-            if (!this.fileModel.findOne({ name: key }))
-                throw new NotFoundException('Cannot found this file');
+        if (!this.fileModel.findOne({ name: key }))
+            throw new NotFoundException('Cannot found this file');
 
-            const result = await this.s3Client.send(
-                new DeleteObjectCommand({
-                    Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
-                    Key: key,
-                }),
+        const result = await this.s3Client.send(
+            new DeleteObjectCommand({
+                Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+                Key: key,
+            }),
+        );
+
+        if (result.$metadata.httpStatusCode === 204) {
+            this.fileModel.updateOne(
+                { name: key },
+                {
+                    deletedBy: user._id,
+                },
             );
-
-            if (result.$metadata.httpStatusCode === 204) {
-                this.fileModel.updateOne(
-                    { name: key },
-                    {
-                        deletedBy: user._id,
-                    },
-                );
-            }
-            return this.fileModel.softDelete({ name: key });
-        } catch (error) {
-            throw new Error(error.message);
         }
+        return this.fileModel.softDelete({ name: key });
     }
 }
 // private getS3() {

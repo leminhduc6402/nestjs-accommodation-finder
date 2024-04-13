@@ -19,47 +19,39 @@ export class FollowService {
     ) {}
 
     async follow(createFollowDto: CreateFollowDto, user: IUser) {
-        try {
-            const { follower_id } = createFollowDto;
-            const isExist = await this.userService.findOne(follower_id);
-            if (!isExist) {
-                throw new NotFoundException('Not found user');
-            }
-            await this.userModel.updateOne(
-                { _id: follower_id },
-                { $push: { followers: user._id } },
-            );
-            const owner = await this.userModel.updateOne(
-                { _id: user._id },
-                { $push: { followings: follower_id } },
-            );
-
-            return owner;
-        } catch (error) {
-            throw new Error(error.message);
+        const { follower_id } = createFollowDto;
+        const isExist = await this.userService.findOne(follower_id);
+        if (!isExist) {
+            throw new NotFoundException('Not found user');
         }
+        await this.userModel.updateOne(
+            { _id: follower_id },
+            { $push: { followers: user._id } },
+        );
+        const owner = await this.userModel.updateOne(
+            { _id: user._id },
+            { $push: { followings: follower_id } },
+        );
+
+        return owner;
     }
 
     async unFollow(createFollowDto: CreateFollowDto, user: IUser) {
-        try {
-            const { follower_id } = createFollowDto;
-            const isExist = await this.userService.findOne(follower_id);
-            if (!isExist) {
-                throw new NotFoundException('Not found user');
-            }
-            await this.userModel.updateOne(
-                { _id: follower_id },
-                { $pull: { followers: user._id } },
-            );
-            const owner = await this.userModel.updateOne(
-                { _id: user._id },
-                { $pull: { followings: follower_id } },
-            );
-
-            return owner;
-        } catch (error) {
-            throw new Error(error.message);
+        const { follower_id } = createFollowDto;
+        const isExist = await this.userService.findOne(follower_id);
+        if (!isExist) {
+            throw new NotFoundException('Not found user');
         }
+        await this.userModel.updateOne(
+            { _id: follower_id },
+            { $pull: { followers: user._id } },
+        );
+        const owner = await this.userModel.updateOne(
+            { _id: user._id },
+            { $pull: { followings: follower_id } },
+        );
+
+        return owner;
     }
 
     // findAll() {

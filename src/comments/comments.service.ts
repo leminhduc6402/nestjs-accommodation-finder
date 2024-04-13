@@ -47,21 +47,17 @@ export class CommentsService {
     }
 
     async findAllByArticleId(articleId: string) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(articleId)) {
-                throw new BadRequestException('Can not found the article');
-            }
-            const comments = await this.commentModel
-                .find({ articleId })
-                .sort('-createdAt')
-                .populate({
-                    path: 'createdBy',
-                    select: { fullName: 1, avatar: 1 },
-                });
-            return comments;
-        } catch (error) {
-            throw new Error(error.message);
+        if (!mongoose.Types.ObjectId.isValid(articleId)) {
+            throw new BadRequestException('Can not found the article');
         }
+        const comments = await this.commentModel
+            .find({ articleId })
+            .sort('-createdAt')
+            .populate({
+                path: 'createdBy',
+                select: { fullName: 1, avatar: 1 },
+            });
+        return comments;
     }
 
     findOne(id: number) {
@@ -69,117 +65,97 @@ export class CommentsService {
     }
 
     async update(_id: string, updateCommentDto: UpdateCommentDto, user: IUser) {
-        try {
-            const { articleId } = updateCommentDto;
-            const isExistArticle = await this.articleModel.findOne({
-                _id: articleId,
-            });
-            if (!isExistArticle) {
-                throw new BadRequestException(`The article was not exists`);
-            }
-            return await this.commentModel.updateOne(
-                { _id },
-                {
-                    ...updateCommentDto,
-                    updatedBy: user._id,
-                },
-                { new: true },
-            );
-        } catch (error) {
-            throw new Error(error.message);
+        const { articleId } = updateCommentDto;
+        const isExistArticle = await this.articleModel.findOne({
+            _id: articleId,
+        });
+        if (!isExistArticle) {
+            throw new BadRequestException(`The article was not exists`);
         }
+        return await this.commentModel.updateOne(
+            { _id },
+            {
+                ...updateCommentDto,
+                updatedBy: user._id,
+            },
+            { new: true },
+        );
     }
 
     async remove(_id: string, user: IUser) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(_id)) {
-                throw new BadRequestException('Not found comment');
-            }
-            await this.commentModel.updateOne({ _id }, { deletedBy: user._id });
-            return this.commentModel.softDelete({ _id });
-        } catch (error) {
-            throw new Error(error.message);
+        if (!mongoose.Types.ObjectId.isValid(_id)) {
+            throw new BadRequestException('Not found comment');
         }
+        await this.commentModel.updateOne({ _id }, { deletedBy: user._id });
+        return this.commentModel.softDelete({ _id });
     }
 
     async addReply(_id: string, createReplyDto: CreateReplyDto, user: IUser) {
-        try {
-            const { content } = createReplyDto;
-            const isExist = await this.commentModel.findById(_id);
-            if (!isExist) {
-                throw new NotFoundException();
-            }
-            const reply = {
-                _id: uuidv4(),
-                content,
-                updatedAt: new Date(),
-                updatedBy: {
-                    _id: new mongoose.Types.ObjectId(user._id),
-                    email: user.email,
-                    fullName: user.fullName,
-                    avatar: user.avatar,
-                },
-            };
-            const comment = await this.commentModel.updateOne(
-                { _id },
-                {
-                    $push: {
-                        replies: reply,
-                    },
-                },
-            );
-            return comment;
-        } catch (error) {
-            throw new Error(error.message);
+        const { content } = createReplyDto;
+        const isExist = await this.commentModel.findById(_id);
+        if (!isExist) {
+            throw new NotFoundException();
         }
+        const reply = {
+            _id: uuidv4(),
+            content,
+            updatedAt: new Date(),
+            updatedBy: {
+                _id: new mongoose.Types.ObjectId(user._id),
+                email: user.email,
+                fullName: user.fullName,
+                avatar: user.avatar,
+            },
+        };
+        const comment = await this.commentModel.updateOne(
+            { _id },
+            {
+                $push: {
+                    replies: reply,
+                },
+            },
+        );
+        return comment;
     }
 
     async editReply(_id: string, updateReplyDto: UpdateReplyDto, user: IUser) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(_id)) {
-                throw new BadRequestException('Must be ObjectId type');
-            }
+        if (!mongoose.Types.ObjectId.isValid(_id)) {
+            throw new BadRequestException('Must be ObjectId type');
+        }
 
-            const { content, reply_id } = updateReplyDto;
+        const { content, reply_id } = updateReplyDto;
 
-            const updatedComment = await this.commentModel.findOneAndUpdate(
-                { _id, 'replies._id': reply_id },
-                {
-                    $set: {
-                        'replies.$.content': content,
-                        'replies.$.updatedBy': {
-                            _id: user._id,
-                            email: user.email,
-                            fullName: user.fullName,
-                            avatar: user.avatar,
-                        },
+        const updatedComment = await this.commentModel.findOneAndUpdate(
+            { _id, 'replies._id': reply_id },
+            {
+                $set: {
+                    'replies.$.content': content,
+                    'replies.$.updatedBy': {
+                        _id: user._id,
+                        email: user.email,
+                        fullName: user.fullName,
+                        avatar: user.avatar,
                     },
                 },
-                { new: true },
-            );
+            },
+            { new: true },
+        );
 
-            if (!updatedComment) {
-                throw new NotFoundException('Comment or Reply not found');
-            }
-
-            return updatedComment;
-        } catch (error) {
-            throw new Error(error.message);
+        if (!updatedComment) {
+            throw new NotFoundException('Comment or Reply not found');
         }
+
+        return updatedComment;
     }
 
     async removeReply(_id: string, reply_id: string) {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(_id)) {
-                throw new BadRequestException('Must be ObjectId type');
-            }
-            return await this.commentModel.updateOne(
-                { _id },
-                { $pull: { replies: { _id: reply_id } } },
-                { new: true },
-            );
-        } catch (error) {
-            throw new Error(error.message);
+        if (!mongoose.Types.ObjectId.isValid(_id)) {
+            throw new BadRequestException('Must be ObjectId type');
         }
+        return await this.commentModel.updateOne(
+            { _id },
+            { $pull: { replies: { _id: reply_id } } },
+            { new: true },
+        );
     }
 }
