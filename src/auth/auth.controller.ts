@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Get,
+    Patch,
     Post,
     Req,
     Res,
@@ -14,7 +15,7 @@ import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { RegisterUserDto, UserLoginDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
 import { AuthService } from './auth.service';
-import { VerifyDto } from './dto/auth-dto';
+import { ChangePassword, ForgotPassword, VerifyDto } from './dto/auth-dto';
 import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -121,5 +122,31 @@ export class AuthController {
     @Post('verify')
     async verifyAccount(@Body() verifyDto: VerifyDto) {
         return await this.authService.verify(verifyDto);
+    }
+
+    @ResponseMessage('Change password')
+    @ApiBody({ type: ChangePassword })
+    @ApiOperation({ summary: 'Change password' })
+    @Patch('/changePassword')
+    changePassword(
+        @Req() req: any,
+        @Body() changePassword: ChangePassword,
+        @User() user: IUser,
+    ) {
+        const refreshToken = req.cookies['refresh_token'];
+        return this.authService.changePassword(
+            refreshToken,
+            changePassword,
+            user,
+        );
+    }
+
+    @Public()
+    @ResponseMessage('Forgot password')
+    @ApiBody({ type: ForgotPassword })
+    @ApiOperation({ summary: 'Forgot password' })
+    @Patch('/forgotPassword')
+    forgotPassword(@Body() forgotPassword: ForgotPassword) {
+        return this.authService.forgotPassword(forgotPassword);
     }
 }
