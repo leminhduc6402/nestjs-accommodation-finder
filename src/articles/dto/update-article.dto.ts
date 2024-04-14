@@ -1,4 +1,60 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateArticleDto } from './create-article.dto';
+import { IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 
-export class UpdateArticleDto extends PartialType(CreateArticleDto) {}
+export class UpdateArticleDto {
+    @IsNotEmpty({ message: 'The _id field cannot be empty' })
+    _id: string;
+
+    @IsNotEmpty()
+    title: string;
+
+    @IsNotEmpty()
+    description: string;
+
+    @IsNotEmpty()
+    categoryId: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    price: number;
+
+    @IsNotEmpty()
+    acreage: number;
+
+    status: string;
+
+    @IsNotEmpty()
+    quantity: number;
+
+    @IsNotEmpty()
+    streetAddress: string;
+
+    @IsNotEmpty()
+    latitude: number;
+
+    @IsNotEmpty()
+    longitude: number;
+
+    @IsNotEmpty()
+    provinceCode: string;
+
+    @IsNotEmpty()
+    districtCode: string;
+
+    @IsNotEmpty()
+    wardCode: string;
+
+    @IsNotEmpty()
+    provinceName: string;
+
+    @IsNotEmpty()
+    districtName: string;
+
+    @IsNotEmpty()
+    wardName: string;
+
+    @IsNotEmpty()
+    @IsArray()
+    images: string[];
+}

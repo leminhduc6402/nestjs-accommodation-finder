@@ -25,6 +25,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
+
   //config CORS (Cross-Origin Resource Sharing)
   app.enableCors({
     origin: true,
