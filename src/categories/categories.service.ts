@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -72,16 +76,26 @@ export class CategoriesService {
         });
     }
 
-    update(_id: string, updateCategoryDto: UpdateCategoryDto, user: IUser) {
-        return this.categoryModel.updateOne(
-            {
-                _id,
-            },
-            {
-                ...updateCategoryDto,
-                updatedBy: user._id,
-            },
+    async update(
+        _id: string,
+        updateCategoryDto: UpdateCategoryDto,
+        user: IUser,
+    ) {
+        const category = await this.categoryModel.findById(_id);
+        if (!category) {
+            throw new NotFoundException();
+        }
+        const { name } = updateCategoryDto;
+
+        const isDuplicate = await this.categoryModel.findOne({ name });
+        if (isDuplicate)
+            throw new BadRequestException(`Name: ${name} already exists`);
+        const updated = await this.categoryModel.findByIdAndUpdate(
+            { _id },
+            { name },
+            { new: true },
         );
+        return updated;
     }
 
     async remove(id: string, user: IUser) {

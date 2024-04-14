@@ -1,5 +1,4 @@
 import { IsEmail, IsNotEmpty, IsPhoneNumber } from 'class-validator';
-import { CreateUserDto } from './create-user.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 export class UpdateUserDto {

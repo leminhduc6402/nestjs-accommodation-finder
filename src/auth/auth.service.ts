@@ -69,11 +69,7 @@ export class AuthService {
     }
 
     async findUserByEmail(email: string) {
-        try {
-            return await this.usersService.findOneByEmail(email);
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return await this.usersService.findOneByEmail(email);
     }
 
     async login(user: IUser, response: Response) {
@@ -243,12 +239,12 @@ export class AuthService {
             throw new BadRequestException();
         }
         const currentUser: IUser = {
-            _id: user._id+'',
+            _id: user._id + '',
             fullName: user.fullName,
             email: email,
             avatar: user.avatar,
             role: user.role,
-        }
+        };
         return await this.usersService.changePassword(newPassword, currentUser);
     };
 }

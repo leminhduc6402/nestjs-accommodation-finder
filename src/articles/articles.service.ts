@@ -29,41 +29,37 @@ export class ArticlesService {
     ) {}
 
     async create(createArticleDto: CreateArticleDto, user: IUser) {
-        try {
-            const {
+        const {
+            streetAddress,
+            latitude,
+            longitude,
+            provinceCode,
+            districtCode,
+            wardCode,
+            provinceName,
+            districtName,
+            wardName,
+        } = createArticleDto;
+        const article = await this.articleModel.create({
+            ...createArticleDto,
+            status: 'UNVERIFY',
+            address: {
                 streetAddress,
-                latitude,
-                longitude,
                 provinceCode,
                 districtCode,
                 wardCode,
                 provinceName,
                 districtName,
                 wardName,
-            } = createArticleDto;
-            const article = await this.articleModel.create({
-                ...createArticleDto,
-                status: 'UNVERIFY',
-                address: {
-                    streetAddress,
-                    provinceCode,
-                    districtCode,
-                    wardCode,
-                    provinceName,
-                    districtName,
-                    wardName,
-                },
-                location: {
-                    coordinates: [longitude, latitude],
-                    type: 'Point',
-                },
-                createdBy: user._id,
-            });
+            },
+            location: {
+                coordinates: [longitude, latitude],
+                type: 'Point',
+            },
+            createdBy: user._id,
+        });
 
-            return article;
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return article;
     }
 
     async findAll(currentPage: number, limit: number, qs: string) {
@@ -188,6 +184,18 @@ export class ArticlesService {
                 expiredAt: expirationDate.setMonth(
                     expirationDate.getMonth() + 1,
                 ),
+                updatedBy: user._id,
+            },
+        );
+    }
+
+    changeStatus(_id: string, status: string, user: IUser) {
+        return this.articleModel.updateOne(
+            {
+                _id,
+            },
+            {
+                status: status,
                 updatedBy: user._id,
             },
         );
