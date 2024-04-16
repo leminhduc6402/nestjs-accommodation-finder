@@ -25,14 +25,17 @@ export class UsersService {
         private userModel: SoftDeleteModel<UserDocument>,
         private configService: ConfigService,
     ) {}
+
     hashPassword = (password: string) => {
         const salt = genSaltSync(10);
         const hash = hashSync(password, salt);
         return hash;
     };
+
     isValidPassword(password: string, hash: string) {
         return compareSync(password, hash);
     }
+    
     async verifyUser(email: string) {
         return await this.userModel.findOneAndUpdate(
             { email },

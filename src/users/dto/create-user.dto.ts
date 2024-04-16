@@ -71,6 +71,10 @@ export class RegisterUserDto {
 
     @IsNotEmpty()
     password: string;
+
+    @ApiProperty({ required: false })
+    @IsPhoneNumber('VN')
+    phone: string;
 }
 export class UserLoginDto {
     @IsString()

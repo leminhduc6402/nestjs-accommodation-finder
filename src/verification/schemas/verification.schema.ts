@@ -19,11 +19,14 @@ export class Verification {
     @Prop()
     video: string[];
 
-    @Prop()
+    @Prop({ enum: ['PENDING', 'REJECTED', 'SUCCESSED'] })
     status: string;
 
+    @Prop()
+    feedBack: string;
+
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Article.name })
-    articleId: mongoose.Schema.Types.ObjectId
+    articleId: mongoose.Schema.Types.ObjectId;
 
     @Prop({ type: Date })
     createdAt: Date;

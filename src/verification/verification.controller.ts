@@ -28,15 +28,13 @@ export class VerificationController {
         return this.verificationService.create(createVerificationDto, user);
     }
 
-    @Get(':id')
+    @Get()
     async findAll(
-        @Param('id') id: string,
         @Query('current') currentPage: string,
         @Query('pageSize') limit: string,
         @Query() qs: string,
     ) {
         return await this.verificationService.findAllByArticleId(
-            id,
             +currentPage,
             +limit,
             qs,
@@ -51,11 +49,10 @@ export class VerificationController {
 
     @Patch()
     update(
-        @Body('id') id: string,
-        @Body('status') status: string,
+        @Body() updateVerificationDto: UpdateVerificationDto,
         @User() user: IUser,
     ) {
-        return this.verificationService.update(id, status, user);
+        return this.verificationService.update(updateVerificationDto, user);
     }
 
     @Delete(':id')

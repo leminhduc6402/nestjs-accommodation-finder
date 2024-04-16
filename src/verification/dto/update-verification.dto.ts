@@ -1,4 +1,10 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateVerificationDto } from './create-verification.dto';
 
-export class UpdateVerificationDto extends PartialType(CreateVerificationDto) {}
+import { IsMongoId, IsNotEmpty } from 'class-validator';
+
+export class UpdateVerificationDto {
+    id: string;
+
+    status: string;
+    
+    feedBack: string;
+}
