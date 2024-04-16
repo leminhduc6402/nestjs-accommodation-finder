@@ -31,7 +31,7 @@ export class Article {
     @Prop({ required: true })
     quantity: number;
 
-    @Prop()
+    @Prop({enum: ['UNVERIFY', 'VERIFIED']})
     status: string;
 
     @Prop()

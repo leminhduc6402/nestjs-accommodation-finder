@@ -47,7 +47,6 @@ export class VerificationService {
     }
 
     async findAllByArticleId(
-        id: string,
         currentPage: number,
         limit: number,
         qs: string,
@@ -87,7 +86,8 @@ export class VerificationService {
             .populate({ path: 'articleId' });
     }
 
-    async update(id: string, status: string, user: IUser) {
+    async update(updateVerificationDto: UpdateVerificationDto, user: IUser) {
+        const { id, status, feedBack } = updateVerificationDto;
         const verification = await this.verificationModel.findById(id);
         const { articleId } = verification;
         const article = await this.articleService.findOne(articleId + '');
@@ -95,22 +95,25 @@ export class VerificationService {
         if (!verification || !article) {
             throw new NotFoundException();
         }
-        if (article.article.status !== 'VERIFY') {
-            if (verification.status === 'PENDING') {
-                if (status === 'SUCCESS') {
-                    await this.articleService.changeStatus(
-                        articleId.toString(),
-                        'VERIFY',
-                        user,
-                    );
-                }
-                return await this.verificationModel.findOneAndUpdate(
-                    { _id: id },
-                    { status },
+
+        if (
+            article.article.status !== 'VERIFY' &&
+            verification.status === 'PENDING'
+        ) {
+            if (verification.status === 'PENDING' && status === 'SUCCESSED') {
+                await this.articleService.changeStatus(
+                    articleId.toString(),
+                    'VERIFY',
+                    user,
                 );
             }
+            return await this.verificationModel.findOneAndUpdate(
+                { _id: id },
+                { status, feedBack },
+                { new: true },
+            );
         }
-        return new BadRequestException();
+        throw new BadRequestException();
     }
 
     remove(id: number) {
