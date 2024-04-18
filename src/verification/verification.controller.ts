@@ -11,15 +11,17 @@ import {
 import { VerificationService } from './verification.service';
 import { CreateVerificationDto } from './dto/create-verification.dto';
 import { UpdateVerificationDto } from './dto/update-verification.dto';
-import { Public, User } from 'src/customDecorator/customize';
+import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { IUser } from 'src/users/users.interface';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Verifications')
 @Controller('verifications')
 export class VerificationController {
     constructor(private readonly verificationService: VerificationService) {}
 
+    @ApiOperation({ summary: 'Create a verification' })
+    @ResponseMessage('Create a verification')
     @Post()
     create(
         @Body() createVerificationDto: CreateVerificationDto,
@@ -28,6 +30,8 @@ export class VerificationController {
         return this.verificationService.create(createVerificationDto, user);
     }
 
+    @ApiOperation({ summary: 'Fetch all verification by article id' })
+    @ResponseMessage('Fetch all verification by article id')
     @Get()
     async findAll(
         @Query('current') currentPage: string,
@@ -41,22 +45,20 @@ export class VerificationController {
         );
     }
 
-    @Public()
+    @ApiOperation({ summary: 'Get verification by id' })
+    @ResponseMessage('Fetch a verification by id')
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.verificationService.findOne(id);
     }
 
+    @ApiOperation({ summary: 'Update verification' })
+    @ResponseMessage('Update a verification')
     @Patch()
     update(
         @Body() updateVerificationDto: UpdateVerificationDto,
         @User() user: IUser,
     ) {
         return this.verificationService.update(updateVerificationDto, user);
-    }
-
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.verificationService.remove(+id);
     }
 }

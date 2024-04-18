@@ -110,7 +110,7 @@ export class ArticlesService {
 
         const verificationResult = await this.verificationModel
             .find({ articleId: article._id })
-            .sort({ createdBy: -1 })
+            .sort({ createdAt: -1 })
             .limit(1);
 
         const comments = await this.commentService.findAllByArticleId(

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { CreateLandlordRequestDto } from './dto/create-landlord-request.dto';
 import { UpdateLandlordRequestDto } from './dto/update-landlord-request.dto';
 import { IUser } from 'src/users/users.interface';
@@ -20,7 +24,19 @@ export class LandlordRequestService {
         createLandlordRequestDto: CreateLandlordRequestDto,
         user: IUser,
     ) {
-        // const isValid = await
+        const isValid = await this.landlordRequestModel
+            .find({
+                createdBy: user._id,
+            })
+            .sort({ createdAt: -1 })
+            .limit(1);
+        if (isValid.length > 0) {
+            if (isValid[0]?.status !== 'REJECTED') {
+                throw new BadRequestException(
+                    `Your request is in status: ${isValid[0]?.status} `,
+                );
+            }
+        }
         const landlordRequest = this.landlordRequestModel.create({
             ...createLandlordRequestDto,
             createdBy: user._id,
@@ -32,7 +48,6 @@ export class LandlordRequestService {
         const { filter, sort, population, projection } = aqp(qs);
         delete filter.current;
         delete filter.pageSize;
-
         let offset = (+currentPage - 1) * +limit;
         let defaultLimit = +limit ? +limit : 10;
         const totalItems = (await this.landlordRequestModel.find(filter))
@@ -60,19 +75,25 @@ export class LandlordRequestService {
     }
 
     findOne(id: string) {
-        return this.landlordRequestModel
-            .findById(id)
-            .populate({
-                path: 'createdBy updatedBy',
-                select: { fullName: 1, avatar: 1, email: 1, role: 1 },
-            });
+        return this.landlordRequestModel.findById(id).populate({
+            path: 'createdBy updatedBy',
+            select: { fullName: 1, avatar: 1, email: 1, role: 1 },
+        });
     }
 
-    update(id: number, updateLandlordRequestDto: UpdateLandlordRequestDto) {
-        return `This action updates a #${id} landlordRequest`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} landlordRequest`;
+    async update(updateLandlordRequestDto: UpdateLandlordRequestDto) {
+        const { id, status, feedBack } = updateLandlordRequestDto;
+        const isExist = await this.landlordRequestModel.findById(id);
+        if (!isExist) {
+            throw new NotFoundException();
+        }
+        if (status === "APPROVED") {
+            // Cập nhật role của người dùng dựa theo tên role FE gửi
+        }
+        return await this.landlordRequestModel.findOneAndUpdate(
+            { _id: id },
+            { status, feedBack },
+            { new: true },
+        );
     }
 }
