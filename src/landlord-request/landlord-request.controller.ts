@@ -11,15 +11,19 @@ import {
 import { LandlordRequestService } from './landlord-request.service';
 import { CreateLandlordRequestDto } from './dto/create-landlord-request.dto';
 import { UpdateLandlordRequestDto } from './dto/update-landlord-request.dto';
-import { User } from 'src/customDecorator/customize';
+import { ResponseMessage, User } from 'src/customDecorator/customize';
 import { IUser } from 'src/users/users.interface';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Landlord-request')
 @Controller('landlord-request')
 export class LandlordRequestController {
     constructor(
         private readonly landlordRequestService: LandlordRequestService,
     ) {}
 
+    @ApiOperation({ summary: 'Create a request' })
+    @ResponseMessage('Create a request')
     @Post()
     create(
         @Body() createLandlordRequestDto: CreateLandlordRequestDto,
@@ -31,6 +35,9 @@ export class LandlordRequestController {
         );
     }
 
+    @ApiOperation({ summary: 'Fetch all request with paginate' })
+    @ResponseMessage('Fetch all request with paginate')
+    @ApiQuery({ name: 'createdBy', required: false })
     @Get()
     findAll(
         @Query('current') currentPage: string,
@@ -44,24 +51,17 @@ export class LandlordRequestController {
         );
     }
 
+    @ApiOperation({ summary: 'Get a request by id' })
+    @ResponseMessage('Get a request by id')
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.landlordRequestService.findOne(id);
     }
 
-    @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateLandlordRequestDto: UpdateLandlordRequestDto,
-    ) {
-        return this.landlordRequestService.update(
-            +id,
-            updateLandlordRequestDto,
-        );
-    }
-
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.landlordRequestService.remove(+id);
+    @ApiOperation({ summary: 'Update a request' })
+    @ResponseMessage('Update a request')
+    @Patch()
+    update(@Body() updateLandlordRequestDto: UpdateLandlordRequestDto) {
+        return this.landlordRequestService.update(updateLandlordRequestDto);
     }
 }

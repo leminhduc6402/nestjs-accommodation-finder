@@ -1,4 +1,5 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsEnum, IsIn, IsNotEmpty } from 'class-validator';
+import { genderEnum, landlordRequestStatusEnum } from 'src/enum/enum';
 
 export class CreateLandlordRequestDto {
     @IsNotEmpty()
@@ -11,6 +12,7 @@ export class CreateLandlordRequestDto {
     address: string;
 
     @IsNotEmpty()
+    @IsEnum(genderEnum)
     gender: string;
 
     @IsNotEmpty()
@@ -20,7 +22,8 @@ export class CreateLandlordRequestDto {
     dateOfIssue: Date;
 
     @IsNotEmpty()
-    status: string
+    // @IsEnum(landlordRequestStatusEnum)
+    status: string;
 
     @IsNotEmpty()
     placeOfIssue: string;

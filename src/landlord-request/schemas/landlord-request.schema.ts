@@ -5,7 +5,7 @@ export type LandlordRequestDocument = HydratedDocument<LandlordRequest>;
 
 @Schema({ timestamps: true })
 export class LandlordRequest {
-    @Prop({ required: true, unique: true, index: true })
+    @Prop({ required: true })
     personalID: string;
 
     @Prop({ required: true })
@@ -26,8 +26,8 @@ export class LandlordRequest {
     @Prop({ required: true })
     placeOfIssue: string;
 
-    @Prop({required: true, enum: ['PENDING', 'APPROVED', 'REJECTED']})
-    status: string
+    @Prop({ required: true, enum: ['PENDING', 'APPROVED', 'REJECTED'] })
+    status: string;
 
     @Prop()
     feedBack: string;

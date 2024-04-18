@@ -46,11 +46,7 @@ export class VerificationService {
         });
     }
 
-    async findAllByArticleId(
-        currentPage: number,
-        limit: number,
-        qs: string,
-    ) {
+    async findAllByArticleId(currentPage: number, limit: number, qs: string) {
         const { filter, sort, population, projection } = aqp(qs);
         delete filter.current;
         delete filter.pageSize;
@@ -114,9 +110,5 @@ export class VerificationService {
             );
         }
         throw new BadRequestException();
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} verification`;
     }
 }
