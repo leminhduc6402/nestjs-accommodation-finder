@@ -38,17 +38,15 @@ export class LandlordRequestController {
     @ApiOperation({ summary: 'Fetch all request with paginate' })
     @ResponseMessage('Fetch all request with paginate')
     @ApiQuery({ name: 'createdBy', required: false })
+    @ApiQuery({ name: 'populate', required: false })
+    @ApiQuery({ name: 'fields', required: false })
     @Get()
     findAll(
         @Query('current') currentPage: string,
         @Query('pageSize') limit: string,
         @Query() qs: string,
     ) {
-        return this.landlordRequestService.findAllByUserId(
-            +currentPage,
-            +limit,
-            qs,
-        );
+        return this.landlordRequestService.findAll(+currentPage, +limit, qs);
     }
 
     @ApiOperation({ summary: 'Get a request by id' })

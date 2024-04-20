@@ -44,10 +44,11 @@ export class LandlordRequestService {
         return landlordRequest;
     }
 
-    async findAllByUserId(currentPage: number, limit: number, qs: string) {
+    async findAll(currentPage: number, limit: number, qs: string) {
         const { filter, sort, population, projection } = aqp(qs);
         delete filter.current;
         delete filter.pageSize;
+
         let offset = (+currentPage - 1) * +limit;
         let defaultLimit = +limit ? +limit : 10;
         const totalItems = (await this.landlordRequestModel.find(filter))
@@ -87,7 +88,7 @@ export class LandlordRequestService {
         if (!isExist) {
             throw new NotFoundException();
         }
-        if (status === "APPROVED") {
+        if (status === 'APPROVED') {
             // Cập nhật role của người dùng dựa theo tên role FE gửi
         }
         return await this.landlordRequestModel.findOneAndUpdate(
