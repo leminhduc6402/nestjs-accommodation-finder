@@ -35,7 +35,7 @@ export class UsersService {
     isValidPassword(password: string, hash: string) {
         return compareSync(password, hash);
     }
-    
+
     async verifyUser(email: string) {
         return await this.userModel.findOneAndUpdate(
             { email },
@@ -95,6 +95,14 @@ export class UsersService {
         return await this.userModel
             .findOne({ refreshToken })
             .populate({ path: 'role', select: { name: 1 } });
+    };
+
+    checkValidFollower = async (followerId: string, userId: string) => {
+        const user = await this.userModel.findOne({
+            _id: followerId,
+            followers: userId,
+        });
+        return !!user;
     };
 
     // CRUD user

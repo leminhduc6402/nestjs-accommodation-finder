@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { UpdateFollowDto } from './dto/update-follow.dto';
 import { IUser } from 'src/users/users.interface';
@@ -23,6 +23,13 @@ export class FollowService {
         const isExist = await this.userService.findOne(follower_id);
         if (!isExist) {
             throw new NotFoundException('Not found user');
+        }
+        const isValid = await this.userService.checkValidFollower(
+            follower_id,
+            user._id,
+        );
+        if (isValid) {
+            throw new ConflictException();
         }
         await this.userModel.updateOne(
             { _id: follower_id },

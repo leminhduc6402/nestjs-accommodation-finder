@@ -51,7 +51,7 @@ export class Article {
     @Prop({ type: Object })
     location: {
         coordinates: number[];
-        type: string;
+        type: string;   
     };
 
     @Prop({ required: true })

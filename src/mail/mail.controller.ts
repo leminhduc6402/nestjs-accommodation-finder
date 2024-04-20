@@ -23,10 +23,10 @@ export class MailController {
     @Get()
     async handleTestEmail() {
         await this.mailerService.sendMail({
-            to: '2051052028dat@ou.edu.vn',
+            to: 'ducprotc456@gmail.com',
             from: '"Support Team" <support@example.com>',
             subject: 'Welcome to Nice App! Confirm your Email',
-            template: 'test',
+            template: 'new-article',
         });
     }
 
