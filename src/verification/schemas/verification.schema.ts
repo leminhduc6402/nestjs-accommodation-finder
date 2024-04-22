@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Article } from 'src/articles/schemas/article.schema';
+import { verificationStatusEnum } from 'src/enum/enum';
 import { User } from 'src/users/schemas/user.schema';
 
 export type VerificationDocument = HydratedDocument<Verification>;
@@ -19,8 +20,8 @@ export class Verification {
     @Prop()
     video: string[];
 
-    @Prop({ enum: ['PENDING', 'REJECTED', 'SUCCESSED'] })
-    status: string;
+    @Prop({ enum: verificationStatusEnum })
+    status: verificationStatusEnum;
 
     @Prop()
     feedBack: string;

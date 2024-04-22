@@ -7,7 +7,7 @@ export class UpdateLandlordRequestDto {
 
     @IsNotEmpty()
     @IsEnum(landlordRequestStatusEnum)
-    status: string;
+    status: landlordRequestStatusEnum;
 
     feedBack: string;
 }

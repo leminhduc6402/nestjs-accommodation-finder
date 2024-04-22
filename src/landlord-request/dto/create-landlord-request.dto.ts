@@ -23,7 +23,7 @@ export class CreateLandlordRequestDto {
 
     @IsNotEmpty()
     // @IsEnum(landlordRequestStatusEnum)
-    status: string;
+    status: landlordRequestStatusEnum;
 
     @IsNotEmpty()
     placeOfIssue: string;

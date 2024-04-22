@@ -3,7 +3,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import otpGenerator from 'otp-generator';
-import { SendMailDto } from './dto/mail.dto';
+import { SendMailDto, SendNewArticleDto } from './dto/mail.dto';
+import { IUser } from 'src/users/users.interface';
 
 @Injectable()
 export class MailService {
@@ -39,5 +40,27 @@ export class MailService {
             throw new NotFoundException();
         }
         return passcode;
+    }
+
+    async sendNewArticleEmail(sendNewArticleDto: SendNewArticleDto) {
+        const { article, email } = sendNewArticleDto;
+        await this.mailerService.sendMail({
+            to: email,
+            from: '"Support Team" <support@example.com>',
+            subject: `${article.createdBy.email} has posted a new article`,
+            template: 'new-article',
+            context: {
+                images: article.images[0],
+                title: article.title,
+                districtName: article.address.districtName,
+                provinceName: article.address.provinceName,
+                price: article.price,
+                category: article.categoryId?.name + '',
+                quantity: article.quantity,
+                postedBy: article.createdBy?.fullName + '',
+                phone: article.createdBy?.phone + '',
+                id: article._id + '',
+            },
+        });
     }
 }
