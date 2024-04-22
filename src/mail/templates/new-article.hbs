@@ -37,7 +37,7 @@
                                                     src='https://nestjs-accommodation-finder.s3.amazonaws.com/50631dc4-48d1-4f32-80a1-29b9b7f0aeb0-1123014.jpg'
                                                 />
 
-                                                <table
+                                                {{! <table
                                                     cellpadding='0'
                                                     cellspacing='0'
                                                     border='0'
@@ -72,15 +72,16 @@
                                                             />
                                                         </td>
                                                     </tr>
-                                                </table>
-                                                <h1 style='margin: 1rem 0'>Your
-                                                    Title</h1>
+                                                </table> }}
+                                                <h1
+                                                    style='margin: 1rem 0'
+                                                >{{title}}</h1>
 
                                                 <table
                                                     cellpadding='10px'
                                                     border='1px'
                                                     width='100%'
-                                                    style='border-collapse: collapse;'
+                                                    style='border-collapse: collapse; margin-bottom: 12px'
                                                 >
                                                     <tr>
                                                         <td
@@ -89,8 +90,8 @@
                                                         <td
                                                             colspan='3'
                                                             style='color: #0045a8;'
-                                                        >Bình Tân, Thành phố Hồ
-                                                            Chí Minh</td>
+                                                        >{{districtName}},
+                                                            {{provinceName}}</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Price</td>
@@ -99,42 +100,44 @@
                                                             style='color: #0045a8;'
                                                         ><strong
                                                                 style='margin-right: 5px;'
-                                                            >5000000</strong>VND</td>
+                                                            >{{price}}</strong>VND</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Category</td>
                                                         <td
                                                             width='30%'
                                                             style='color: #0045a8;'
-                                                        >Nhà trọ</td>
+                                                        >{{category}}</td>
                                                         <td
                                                             width='15%'
                                                         >Quantity</td>
                                                         <td
                                                             width='35%'
                                                             style='color: #0045a8;'
-                                                        >4</td>
+                                                        >{{quantity}}</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Posted by</td>
                                                         <td
                                                             width='30%'
                                                             style='color: #0045a8;'
-                                                        >leminhduc6402@gmail.com</td>
+                                                        >{{postedBy}}</td>
                                                         <td
                                                             width='15%'
                                                         >Phone</td>
                                                         <td
                                                             width='35%'
                                                             style='color: #0045a8;'
-                                                        >0366004732</td>
+                                                        >{{phone}}</td>
                                                     </tr>
                                                 </table>
+
                                                 <a
-                                                    href='http://localhost:3001/bai-dang/65f90b4528fbf948198bbf04'
+                                                    href='http://localhost:3001/bai-dang/{{id}}'
                                                     target='_blank'
-                                                    style=' text-decoration: none; padding: 12px 24px; border-radius: 4px; color: #FFF; background: #2B52F5; display: inline-block; margin: 0.5rem 0;'
+                                                    style='text-align: center; text-decoration: none; padding: 12px 24px; border-radius: 4px; color: #FFF; background: #2B52F5; display: block; margin: 0.5rem 0;'
                                                 >Go to the Website</a>
+
                                             </div>
                                         </div>
 

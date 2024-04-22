@@ -14,6 +14,7 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import { ArticlesService } from 'src/articles/articles.service';
 import aqp from 'api-query-params';
+import { articleStatusEnum, verificationStatusEnum } from 'src/enum/enum';
 
 @Injectable()
 export class VerificationService {
@@ -27,10 +28,10 @@ export class VerificationService {
         const { articleId } = createVerificationDto;
         const isExistVerification = await this.verificationModel.findOne({
             articleId,
-            status: 'PENDING',
+            status: verificationStatusEnum.PENDING,
         });
         const isVerification = await this.articleService.findOne(articleId);
-        if (isVerification.article.status === 'VERIFY') {
+        if (isVerification.article.status === articleStatusEnum.VERIFY) {
             throw new BadRequestException('The article is in verified status');
         }
         if (isExistVerification) {
@@ -41,7 +42,7 @@ export class VerificationService {
 
         return await this.verificationModel.create({
             ...createVerificationDto,
-            status: 'PENDING',
+            status: verificationStatusEnum.PENDING,
             createdBy: user._id,
         });
     }
@@ -93,13 +94,16 @@ export class VerificationService {
         }
 
         if (
-            article.article.status !== 'VERIFY' &&
-            verification.status === 'PENDING'
+            article.article.status !== articleStatusEnum.VERIFY &&
+            verification.status === verificationStatusEnum.PENDING
         ) {
-            if (verification.status === 'PENDING' && status === 'SUCCESSED') {
+            if (
+                verification.status === verificationStatusEnum.PENDING &&
+                status === verificationStatusEnum.SUCCEED
+            ) {
                 await this.articleService.changeStatus(
                     articleId.toString(),
-                    'VERIFY',
+                    articleStatusEnum.VERIFY,
                     user,
                 );
             }

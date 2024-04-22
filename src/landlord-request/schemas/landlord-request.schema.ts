@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { landlordRequestStatusEnum } from 'src/enum/enum';
 import { User } from 'src/users/schemas/user.schema';
 
 export type LandlordRequestDocument = HydratedDocument<LandlordRequest>;
@@ -27,7 +28,7 @@ export class LandlordRequest {
     @Prop({ required: true })
     placeOfIssue: string;
 
-    @Prop({ required: true, enum: ['PENDING', 'APPROVED', 'REJECTED'] })
+    @Prop({ required: true, enum: landlordRequestStatusEnum })
     status: string;
 
     @Prop()

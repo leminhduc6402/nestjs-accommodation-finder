@@ -17,6 +17,9 @@ import {
     Verification,
     VerificationDocument,
 } from 'src/verification/schemas/verification.schema';
+import { articleStatusEnum } from 'src/enum/enum';
+import { MailService } from 'src/mail/mail.service';
+import { SendNewArticleDto } from 'src/mail/dto/mail.dto';
 
 @Injectable()
 export class ArticlesService {
@@ -26,6 +29,7 @@ export class ArticlesService {
         @InjectModel(Verification.name)
         private verificationModel: SoftDeleteModel<VerificationDocument>,
         private commentService: CommentsService,
+        private mailService: MailService,
     ) {}
 
     async create(createArticleDto: CreateArticleDto, user: IUser) {
@@ -42,7 +46,7 @@ export class ArticlesService {
         } = createArticleDto;
         const article = await this.articleModel.create({
             ...createArticleDto,
-            status: 'UNVERIFY',
+            status: articleStatusEnum.UNVERIFY,
             address: {
                 streetAddress,
                 provinceCode,
@@ -58,7 +62,21 @@ export class ArticlesService {
             },
             createdBy: user._id,
         });
-
+        const data = await this.articleModel
+            .findById(article._id)
+            .populate({
+                path: 'createdBy',
+                select: { fullName: 1, phone: 1, email: 1 },
+            })
+            .populate({
+                path: 'categoryId',
+                select: { name: 1 },
+            });
+        // const sendNewArticleDto: SendNewArticleDto = {
+        //     article: data,
+        //     email: 'ducprotc456@gmail.com',
+        // };
+        // await this.mailService.sendNewArticleEmail(sendNewArticleDto);
         return article;
     }
 
@@ -180,7 +198,7 @@ export class ArticlesService {
                 _id,
             },
             {
-                status: 'VERIFY',
+                status: articleStatusEnum.VERIFY,
                 expiredAt: expirationDate.setMonth(
                     expirationDate.getMonth() + 1,
                 ),

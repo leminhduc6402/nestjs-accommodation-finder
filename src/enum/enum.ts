@@ -6,11 +6,16 @@ export enum landlordRequestStatusEnum {
 export enum verificationStatusEnum {
     PENDING = 'PENDING',
     REJECTED = 'REJECTED',
-    SUCCESSED = 'SUCCESSED',
+    SUCCEED = 'SUCCEED',
 }
 
 export enum genderEnum {
     MALE = 'MALE',
     FEMALE = 'FEMALE',
     OTHER = 'OTHER',
+}
+
+export enum articleStatusEnum {
+    VERIFY = 'VERIFY',
+    UNVERIFY = 'UNVERIFY',
 }

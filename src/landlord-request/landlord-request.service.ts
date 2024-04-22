@@ -13,6 +13,7 @@ import {
 } from './schemas/landlord-request.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
+import { landlordRequestStatusEnum } from 'src/enum/enum';
 
 @Injectable()
 export class LandlordRequestService {
@@ -31,7 +32,7 @@ export class LandlordRequestService {
             .sort({ createdAt: -1 })
             .limit(1);
         if (isValid.length > 0) {
-            if (isValid[0]?.status !== 'REJECTED') {
+            if (isValid[0]?.status !== landlordRequestStatusEnum.REJECTED) {
                 throw new BadRequestException(
                     `Your request is in status: ${isValid[0]?.status} `,
                 );
@@ -82,19 +83,35 @@ export class LandlordRequestService {
         });
     }
 
-    async update(updateLandlordRequestDto: UpdateLandlordRequestDto) {
+    async update(
+        updateLandlordRequestDto: UpdateLandlordRequestDto,
+        user: IUser,
+    ) {
         const { id, status, feedBack } = updateLandlordRequestDto;
         const isExist = await this.landlordRequestModel.findById(id);
         if (!isExist) {
             throw new NotFoundException();
         }
-        if (status === 'APPROVED') {
+        if (
+            isExist.status === landlordRequestStatusEnum.PENDING &&
+            status === landlordRequestStatusEnum.PENDING
+        ) {
+            throw new BadRequestException(
+                `The request is in status: ${status}`,
+            );
+        }
+        if (status === landlordRequestStatusEnum.APPROVED) {
             // Cập nhật role của người dùng dựa theo tên role FE gửi
         }
-        return await this.landlordRequestModel.findOneAndUpdate(
-            { _id: id },
-            { status, feedBack },
-            { new: true },
-        );
+        return await this.landlordRequestModel
+            .findOneAndUpdate(
+                { _id: id },
+                { status, feedBack, createdBy: user._id },
+                { new: true },
+            )
+            .populate({
+                path: 'createdBy',
+                select: { fullName: 1, avatar: 1 },
+            });
     }
 }
