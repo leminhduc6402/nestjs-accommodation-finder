@@ -48,7 +48,6 @@ export class FilesController {
         return await this.filesService.upload(file, user);
     }
 
-    @Public()
     @ApiOperation({ summary: 'Get all article with pagination' })
     @ResponseMessage('fetch article with pagination')
     @Get()

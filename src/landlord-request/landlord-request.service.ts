@@ -111,7 +111,7 @@ export class LandlordRequestService {
             )
             .populate({
                 path: 'createdBy',
-                select: { fullName: 1, avatar: 1 },
+                select: { fullName: 1, avatar: 1, email: 1 },
             });
     }
 }
