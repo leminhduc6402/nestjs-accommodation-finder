@@ -20,6 +20,7 @@ import {
 import { articleStatusEnum } from 'src/enum/enum';
 import { MailService } from 'src/mail/mail.service';
 import { SendNewArticleDto } from 'src/mail/dto/mail.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ArticlesService {
@@ -29,6 +30,7 @@ export class ArticlesService {
         @InjectModel(Verification.name)
         private verificationModel: SoftDeleteModel<VerificationDocument>,
         private commentService: CommentsService,
+        private usersService: UsersService,
         private mailService: MailService,
     ) {}
 
@@ -62,6 +64,7 @@ export class ArticlesService {
             },
             createdBy: user._id,
         });
+
         const data = await this.articleModel
             .findById(article._id)
             .populate({
@@ -72,11 +75,16 @@ export class ArticlesService {
                 path: 'categoryId',
                 select: { name: 1 },
             });
-        // const sendNewArticleDto: SendNewArticleDto = {
-        //     article: data,
-        //     email: 'ducprotc456@gmail.com',
-        // };
-        // await this.mailService.sendNewArticleEmail(sendNewArticleDto);
+        const arrFollower = (await this.usersService.findOne(user._id))
+            .followers;
+        arrFollower.forEach((item) => {
+            const sendNewArticleDto: SendNewArticleDto = {
+                article: data,
+                email: item.email,
+            };
+            this.mailService.sendNewArticleEmail(sendNewArticleDto);
+        });
+
         return article;
     }
 

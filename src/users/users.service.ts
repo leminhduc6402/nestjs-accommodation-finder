@@ -195,7 +195,7 @@ export class UsersService {
             .select('-password -refreshToken')
             .populate({
                 path: 'followings followers',
-                select: { fullName: 1, avatar: 1 },
+                select: { fullName: 1, avatar: 1, email: 1 },
             });
         return user;
     }
