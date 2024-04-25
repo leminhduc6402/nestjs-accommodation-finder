@@ -4,12 +4,17 @@ import { CommentsModule } from 'src/comments/comments.module';
 import { ArticlesController } from './articles.controller';
 import { ArticlesService } from './articles.service';
 import { Article, ArticleSchema } from './schemas/article.schema';
-import { Verification, VerificationSchema } from 'src/verification/schemas/verification.schema';
+import {
+    Verification,
+    VerificationSchema,
+} from 'src/verification/schemas/verification.schema';
 import { MailModule } from 'src/mail/mail.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
     imports: [
         CommentsModule,
+        UsersModule,
         MailModule,
         MongooseModule.forFeature([
             { name: Article.name, schema: ArticleSchema },
@@ -18,6 +23,6 @@ import { MailModule } from 'src/mail/mail.module';
     ],
     controllers: [ArticlesController],
     providers: [ArticlesService],
-    exports: [ArticlesService]
+    exports: [ArticlesService],
 })
 export class ArticlesModule {}

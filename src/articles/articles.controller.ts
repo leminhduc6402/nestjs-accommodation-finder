@@ -53,10 +53,7 @@ export class ArticlesController {
     @ApiOperation({ summary: 'Update an article' })
     @ResponseMessage('Update an article')
     @Patch('')
-    update(
-        @Body() updateArticleDto: UpdateArticleDto,
-        @User() user: IUser,
-    ) {
+    update(@Body() updateArticleDto: UpdateArticleDto, @User() user: IUser) {
         return this.articlesService.update(updateArticleDto, user);
     }
 
