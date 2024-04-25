@@ -72,7 +72,7 @@ export class CommentsService {
         if (!isExistArticle) {
             throw new BadRequestException(`The article was not exists`);
         }
-        return await this.commentModel.updateOne(
+        return await this.commentModel.findByIdAndUpdate(
             { _id },
             {
                 ...updateCommentDto,
@@ -107,7 +107,7 @@ export class CommentsService {
                 avatar: user.avatar,
             },
         };
-        const comment = await this.commentModel.updateOne(
+        const comment = await this.commentModel.findByIdAndUpdate(
             { _id },
             {
                 $push: {
@@ -152,7 +152,7 @@ export class CommentsService {
         if (!mongoose.Types.ObjectId.isValid(_id)) {
             throw new BadRequestException('Must be ObjectId type');
         }
-        return await this.commentModel.updateOne(
+        return await this.commentModel.findByIdAndUpdate(
             { _id },
             { $pull: { replies: { _id: reply_id } } },
             { new: true },

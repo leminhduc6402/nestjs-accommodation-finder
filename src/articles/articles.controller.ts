@@ -52,13 +52,12 @@ export class ArticlesController {
 
     @ApiOperation({ summary: 'Update an article' })
     @ResponseMessage('Update an article')
-    @Patch(':id')
+    @Patch('')
     update(
-        @Param('id') id: string,
         @Body() updateArticleDto: UpdateArticleDto,
         @User() user: IUser,
     ) {
-        return this.articlesService.update(id, updateArticleDto, user);
+        return this.articlesService.update(updateArticleDto, user);
     }
 
     @ApiOperation({ summary: 'Remove an article' })

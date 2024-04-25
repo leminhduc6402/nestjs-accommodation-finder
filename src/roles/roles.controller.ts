@@ -1,61 +1,66 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    Query,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { IUser } from 'src/users/users.interface';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('roles')
+@ApiTags('Roles')
 @Controller('roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+    constructor(private readonly rolesService: RolesService) {}
 
-  @Post()
-  @ResponseMessage('Create a new role')
-  create(@Body() createRoleDto: CreateRoleDto, @User() user: IUser) {
-    return this.rolesService.create(createRoleDto, user);
-  }
+    @ApiOperation({ summary: 'Create a new role' })
+    @ResponseMessage('Create a new role')
+    @Post()
+    create(@Body() createRoleDto: CreateRoleDto, @User() user: IUser) {
+        return this.rolesService.create(createRoleDto, user);
+    }
 
-  @Get()
-  @ResponseMessage('Fetch all role with paginate')
-  findAll(
-    @Query('current') currentPage: string,
-    @Query('pageSize') limit: string,
-    @Query() qs: string,
-  ) {
-    return this.rolesService.findAll(+currentPage, +limit, qs);
-  }
+    @ApiOperation({ summary: 'Fetch all role with paginate' })
+    @ResponseMessage('Fetch all role with paginate')
+    @Get()
+    findAll(
+        @Query('current') currentPage: string,
+        @Query('pageSize') limit: string,
+        @Query() qs: string,
+    ) {
+        return this.rolesService.findAll(+currentPage, +limit, qs);
+    }
 
-  @Public()
-  @Get(':id')
-  @ResponseMessage('Fetch role by id')
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(id);
-  }
+    @Public()
+    @ApiOperation({ summary: 'Fetch role by id' })
+    @ResponseMessage('Fetch role by id')
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.rolesService.findOne(id);
+    }
 
-  @Patch(':id')
-  @ResponseMessage('Update a role')
-  update(
-    @Param('id') id: string,
-    @Body() updateRoleDto: UpdateRoleDto,
-    @User() user: IUser,
-  ) {
-    return this.rolesService.update(id, updateRoleDto, user);
-  }
+    @ApiOperation({ summary: 'Update a role' })
+    @ResponseMessage('Update a role')
+    @Patch(':id')
+    update(
+        @Param('id') id: string,
+        @Body() updateRoleDto: UpdateRoleDto,
+        @User() user: IUser,
+    ) {
+        return this.rolesService.update(id, updateRoleDto, user);
+    }
 
-  @Delete(':id')
-  @ResponseMessage('Delete a role by id')
-  remove(@Param('id') id: string, @User() user: IUser) {
-    return this.rolesService.remove(id, user);
-  }
+    @ApiOperation({ summary: 'Delete a role by id' })
+    @ResponseMessage('Delete a role by id')
+    @Delete(':id')
+    remove(@Param('id') id: string, @User() user: IUser) {
+        return this.rolesService.remove(id, user);
+    }
 }

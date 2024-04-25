@@ -270,7 +270,7 @@ export class UsersService {
             updateFields.address = { ...updateFields.address, wardName };
         }
 
-        return await this.userModel.updateOne(
+        return await this.userModel.findByIdAndUpdate(
             { _id: updateUserDto._id },
             updateFields,
         );

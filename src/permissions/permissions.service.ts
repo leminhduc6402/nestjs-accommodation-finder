@@ -28,10 +28,7 @@ export class PermissionsService {
             apiPath,
             method,
             module,
-            createdBy: {
-                _id: user._id,
-                email: user.email,
-            },
+            createdBy: user._id,
         });
         return {
             id: newPermission?._id,
@@ -84,7 +81,7 @@ export class PermissionsService {
             throw new BadRequestException('Not found user');
         }
         const { module, method, apiPath, name } = updatePermissionDto;
-        const updated = await this.permissionModel.updateOne(
+        const updated = await this.permissionModel.findByIdAndUpdate(
             { _id },
             {
                 module,

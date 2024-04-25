@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { UpdateFollowDto } from './dto/update-follow.dto';
 import { IUser } from 'src/users/users.interface';
@@ -31,11 +35,11 @@ export class FollowService {
         if (isValid) {
             throw new ConflictException();
         }
-        await this.userModel.updateOne(
+        await this.userModel.findByIdAndUpdate(
             { _id: follower_id },
             { $push: { followers: user._id } },
         );
-        const owner = await this.userModel.updateOne(
+        const owner = await this.userModel.findByIdAndUpdate(
             { _id: user._id },
             { $push: { followings: follower_id } },
         );
@@ -49,11 +53,11 @@ export class FollowService {
         if (!isExist) {
             throw new NotFoundException('Not found user');
         }
-        await this.userModel.updateOne(
+        await this.userModel.findByIdAndUpdate(
             { _id: follower_id },
             { $pull: { followers: user._id } },
         );
-        const owner = await this.userModel.updateOne(
+        const owner = await this.userModel.findByIdAndUpdate(
             { _id: user._id },
             { $pull: { followings: follower_id } },
         );
@@ -61,19 +65,4 @@ export class FollowService {
         return owner;
     }
 
-    // findAll() {
-    //   return `This action returns all follow`;
-    // }
-
-    // findOne(id: number) {
-    //   return `This action returns a #${id} follow`;
-    // }
-
-    // update(id: number, updateFollowDto: UpdateFollowDto) {
-    //   return `This action updates a #${id} follow`;
-    // }
-
-    // remove(id: number) {
-    //   return `This action removes a #${id} follow`;
-    // }
 }
