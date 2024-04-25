@@ -4,21 +4,23 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { ResponseMessage, User } from 'src/customDecorator/customize';
 import { IUser } from 'src/users/users.interface';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('permissions')
+@ApiTags('Permissions')
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
-  @Post()
+  @ApiOperation({ summary: 'Create a new permission' })
   @ResponseMessage('Create a new permission')
+  @Post()
   create(@Body() createPermissionDto: CreatePermissionDto, @User() user: IUser) {
     return this.permissionsService.create(createPermissionDto, user);
   }
 
-  @Get()
+  @ApiOperation({ summary: 'Fetch all permission with paginate' })
   @ResponseMessage('Fetch all permission with paginate')
+  @Get()
   findAll(
     @Query('current') currentPage: string,
     @Query('pageSize') limit: string,
@@ -27,14 +29,16 @@ export class PermissionsController {
     return this.permissionsService.findAll(+currentPage, +limit, qs);
   }
 
-  @Get(':id')
+  @ApiOperation({ summary: 'Fetch permission by id' })
   @ResponseMessage('Fetch permission by id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.permissionsService.findOne(id);
   }
 
-  @Patch(':id')
+  @ApiOperation({ summary: 'Update a permission' })
   @ResponseMessage('Update a permission')
+  @Patch(':id')
   updateStatus(
     @Param('id') id: string,
     @Body() updatePermissionDto: UpdatePermissionDto,
@@ -43,8 +47,9 @@ export class PermissionsController {
     return this.permissionsService.update(id, updatePermissionDto, user);
   }
 
-  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a permission by id' })
   @ResponseMessage('Delete a permission by id')
+  @Delete(':id')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.permissionsService.remove(id, user);
   }

@@ -146,8 +146,9 @@ export class ArticlesService {
         };
     }
 
-    update(_id: string, updateArticleDto: UpdateArticleDto, user: IUser) {
-        return this.articleModel.updateOne(
+    update(updateArticleDto: UpdateArticleDto, user: IUser) {
+        const { _id } = updateArticleDto;
+        return this.articleModel.findByIdAndUpdate(
             {
                 _id,
             },
@@ -155,6 +156,7 @@ export class ArticlesService {
                 ...updateArticleDto,
                 updatedBy: user._id,
             },
+            { new: true },
         );
     }
 

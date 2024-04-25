@@ -28,10 +28,8 @@ export class RolesService {
       description,
       isActive,
       permissions,
-      createdBy: {
-        _id: user._id,
-        email: user.email,
-      },
+      createdBy: user._id,
+
     });
 
     return {
@@ -86,7 +84,7 @@ export class RolesService {
     }
     const { name, description, isActive, permissions } = updateRoleDto;
 
-    const updated = await this.roleModel.updateOne(
+    const updated = await this.roleModel.findByIdAndUpdate(
       { _id },
       {
         name,
