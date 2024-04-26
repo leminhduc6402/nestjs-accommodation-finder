@@ -46,7 +46,7 @@ export class PermissionsService {
         let defaultLimit = +limit ? +limit : 10;
         const totalItems = (await this.permissionModel.find(filter)).length;
         const totalPages = Math.ceil(totalItems / defaultLimit);
-        const result = await this.permissionModel
+        const results = await this.permissionModel
             .find(filter)
             .skip(offset)
             .limit(defaultLimit)
@@ -62,7 +62,7 @@ export class PermissionsService {
                 pages: totalPages, //tổng số trang với điều kiện query
                 total: totalItems, // tổng số phần tử (số bản ghi)
             },
-            result, //kết quả query
+            results, //kết quả query
         };
     }
 

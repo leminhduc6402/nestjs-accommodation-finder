@@ -48,7 +48,7 @@ export class RolesService {
     let defaultLimit = +limit ? +limit : 10;
     const totalItems = (await this.roleModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
-    const result = await this.roleModel
+    const results = await this.roleModel
       .find(filter)
       .skip(offset)
       .limit(defaultLimit)
@@ -64,7 +64,7 @@ export class RolesService {
         pages: totalPages, //tổng số trang với điều kiện query
         total: totalItems, // tổng số phần tử (số bản ghi)
       },
-      result, //kết quả query
+      results, //kết quả query
     };
   }
 
