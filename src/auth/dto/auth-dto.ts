@@ -15,6 +15,10 @@ export class VerifyDto {
 export class ChangePassword {
     @ApiProperty()
     @IsNotEmpty()
+    oldPassword: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
     newPassword: string;
 
     @ApiProperty()

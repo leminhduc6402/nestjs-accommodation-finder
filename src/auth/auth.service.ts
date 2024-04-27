@@ -219,15 +219,26 @@ export class AuthService {
         });
         let isExistUser = await this.usersService.findUserByToken(refreshToken);
         if (isExistUser) {
-            const { newPassword, reNewPassword } = changePassword;
+            const { oldPassword, newPassword, reNewPassword } = changePassword;
 
+            const password = (
+                await this.usersService.findOneByEmail(user.email)
+            ).password;
+
+            const isValid = await this.usersService.isValidPassword(
+                oldPassword,
+                password,
+            );
+            if (!isValid) {
+                throw new BadRequestException('Your password not correct');
+            }
             if (newPassword !== reNewPassword) {
-                throw new BadRequestException('test1');
+                throw new BadRequestException('The new passwords do not match');
             }
 
             return await this.usersService.changePassword(newPassword, user);
         } else {
-            throw new NotFoundException('test2');
+            throw new NotFoundException('Not Found User');
         }
     };
 

@@ -20,7 +20,7 @@ export class PermissionsService {
         const isExist = await this.permissionModel.findOne({ apiPath, method });
         if (isExist)
             throw new BadRequestException(
-                `Permission với apiPath=${apiPath}, method=${method} đã tồn tại`,
+                `Permission with apiPath=${apiPath}, method=${method} already exists`,
             );
 
         const newPermission = await this.permissionModel.create({
@@ -31,7 +31,7 @@ export class PermissionsService {
             createdBy: user._id,
         });
         return {
-            id: newPermission?._id,
+            _id: newPermission?._id,
             createdAt: newPermission?.createdAt,
         };
     }
@@ -104,6 +104,6 @@ export class PermissionsService {
                 deletedBy: user._id,
             },
         );
-        return this.permissionModel.softDelete({ _id: id });
+        return this.permissionModel.deleteOne({ _id: id });
     }
 }
