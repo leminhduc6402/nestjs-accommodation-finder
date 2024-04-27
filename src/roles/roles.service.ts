@@ -33,7 +33,7 @@ export class RolesService {
     });
 
     return {
-      id: newRole?._id,
+      _id: newRole?._id,
       createdAt: newRole?.createdAt,
     };
   }
