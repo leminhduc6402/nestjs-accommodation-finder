@@ -253,7 +253,6 @@ export class AuthService {
             fullName: user.fullName,
             email: email,
             avatar: user.avatar,
-            role: user.role,
         };
         return await this.usersService.changePassword(newPassword, currentUser);
     };

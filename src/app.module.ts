@@ -17,6 +17,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { LandlordRequestModule } from './landlord-request/landlord-request.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
+import { DatabasesModule } from './databases/databases.module';
 @Module({
     imports: [
         ThrottlerModule.forRoot([
@@ -51,6 +52,7 @@ import { RolesModule } from './roles/roles.module';
         LandlordRequestModule,
         PermissionsModule,
         RolesModule,
+        DatabasesModule,
     ],
     controllers: [AppController],
     providers: [AppService],

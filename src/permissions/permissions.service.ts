@@ -30,10 +30,7 @@ export class PermissionsService {
             module,
             createdBy: user._id,
         });
-        return {
-            _id: newPermission?._id,
-            createdAt: newPermission?.createdAt,
-        };
+        return newPermission;
     }
 
     async findAll(currentPage: number, limit: number, qs: string) {
@@ -90,6 +87,7 @@ export class PermissionsService {
                 name,
                 updatedBy: user._id,
             },
+            { new: true },
         );
         return updated;
     }
