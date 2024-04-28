@@ -220,7 +220,6 @@ export class UsersService {
                 path: 'role',
                 select: {
                     name: 1,
-                    // , permission: 1
                 },
             });
     }
@@ -320,4 +319,16 @@ export class UsersService {
             { new: true },
         );
     }
+
+    async findOneAndUpdateRole(id: string, roleId: string) {
+        return await this.userModel.findByIdAndUpdate(
+            { _id: id },
+            {
+                role: roleId,
+            },
+            { new: true },
+        );
+    }
 }
+
+

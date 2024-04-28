@@ -10,4 +10,7 @@ export class UpdateLandlordRequestDto {
     status: landlordRequestStatusEnum;
 
     feedBack: string;
+
+    @IsNotEmpty()
+    roleId: string;
 }

@@ -14,12 +14,17 @@ import {
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
 import { landlordRequestStatusEnum } from 'src/enum/enum';
+import { Role, RoleDocument } from 'src/roles/schemas/role.schema';
+import { RolesService } from 'src/roles/roles.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class LandlordRequestService {
     constructor(
         @InjectModel(LandlordRequest.name)
         private landlordRequestModel: SoftDeleteModel<LandlordRequestDocument>,
+        private roleService: RolesService,
+        private usersService: UsersService,
     ) {}
     async create(
         createLandlordRequestDto: CreateLandlordRequestDto,
@@ -87,7 +92,7 @@ export class LandlordRequestService {
         updateLandlordRequestDto: UpdateLandlordRequestDto,
         user: IUser,
     ) {
-        const { id, status, feedBack } = updateLandlordRequestDto;
+        const { id, status, feedBack, roleId } = updateLandlordRequestDto;
         const isExist = await this.landlordRequestModel.findById(id);
         if (!isExist) {
             throw new NotFoundException();
@@ -101,7 +106,13 @@ export class LandlordRequestService {
             );
         }
         if (status === landlordRequestStatusEnum.APPROVED) {
-            // Cập nhật role của người dùng dựa theo tên role FE gửi
+            const role = await this.roleService.findOne(roleId);
+            if (!role) throw new NotFoundException('Not found role');
+            const updatedRole = await this.usersService.findOneAndUpdateRole(
+                isExist.createdBy + '',
+                role._id + '',
+            );
+            if (!!updatedRole === false) return updatedRole;
         }
         return await this.landlordRequestModel
             .findOneAndUpdate(
