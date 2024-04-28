@@ -196,6 +196,10 @@ export class UsersService {
             .populate({
                 path: 'followings followers',
                 select: { fullName: 1, avatar: 1, email: 1 },
+            })
+            .populate({
+                path: 'role',
+                select: { name: 1 },
             });
         return user;
     }
@@ -208,8 +212,8 @@ export class UsersService {
             .populate({
                 path: 'followers followings',
                 select: { _id: 1, fullName: 1, avatar: 1 },
-            });
-        // .populate({ path: 'role', select: { name: 1 } });
+            })
+            .populate({ path: 'role', select: { name: 1, permission: 1 } });
     }
 
     async update(updateUserDto: UpdateUserDto, user: IUser) {

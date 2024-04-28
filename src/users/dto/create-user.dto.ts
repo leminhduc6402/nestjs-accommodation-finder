@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import { IsEmail, IsMongoId, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import mongoose from 'mongoose';
 
 export class CreateUserDto {
     // @ApiProperty({
@@ -28,7 +29,8 @@ export class CreateUserDto {
 
     @ApiProperty({ required: false })
     @IsNotEmpty()
-    role: string;
+    @IsMongoId()
+    role: mongoose.Schema.Types.ObjectId;
 
     @ApiProperty()
     active?: boolean;

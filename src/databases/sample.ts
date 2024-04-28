@@ -1,5 +1,5 @@
-export const ADMIN_ROLE = 'ADMIN';
-export const USER_ROLE = 'USER';
+export const ADMIN = 'ADMIN';
+export const USER = 'USER';
 export const INIT_PERMISSIONS = [
     //USER
     {
