@@ -17,12 +17,16 @@ import { ConfigService } from '@nestjs/config';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
 import { IUser } from './users.interface';
+import { Role, RoleDocument } from 'src/roles/schemas/role.schema';
+import { USER } from 'src/databases/sample';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(UserModel.name)
         private userModel: SoftDeleteModel<UserDocument>,
+        @InjectModel(Role.name)
+        private roleModel: SoftDeleteModel<RoleDocument>,
         private configService: ConfigService,
     ) {}
 
@@ -56,7 +60,7 @@ export class UsersService {
             throw new BadRequestException(`Email: ${email} already exists`);
         }
 
-        // const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+        const userRole = await this.roleModel.findOne({ name: USER });
 
         const hashPassword = this.hashPassword(password);
 
@@ -66,8 +70,7 @@ export class UsersService {
             password: hashPassword,
             avatar: default_avatar,
             active: false,
-            // role: userRole._id,
-            role: 'USER',
+            role: userRole?._id,
         });
         return newRegister;
     }
@@ -213,7 +216,13 @@ export class UsersService {
                 path: 'followers followings',
                 select: { _id: 1, fullName: 1, avatar: 1 },
             })
-            .populate({ path: 'role', select: { name: 1, permission: 1 } });
+            .populate({
+                path: 'role',
+                select: {
+                    name: 1,
+                    // , permission: 1
+                },
+            });
     }
 
     async update(updateUserDto: UpdateUserDto, user: IUser) {
