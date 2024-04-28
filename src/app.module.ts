@@ -18,8 +18,10 @@ import { LandlordRequestModule } from './landlord-request/landlord-request.modul
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { DatabasesModule } from './databases/databases.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
     imports: [
+        ScheduleModule.forRoot(),
         ThrottlerModule.forRoot([
             {
                 ttl: 10000,

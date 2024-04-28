@@ -16,6 +16,7 @@ import { IUser } from 'src/users/users.interface';
 import { ArticlesService } from './articles.service';
 import { ArticleQueryString, CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { Cron, CronExpression } from '@nestjs/schedule';
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
@@ -47,7 +48,8 @@ export class ArticlesController {
     @ResponseMessage('Get an article by id')
     @Get(':id')
     findOne(@Param('id') id: string) {
-        return this.articlesService.findOne(id);
+        // return this.articlesService.findOne(id);
+        return this.articlesService.markArticleAsUnverified();
     }
 
     @ApiOperation({ summary: 'Update an article' })
@@ -81,4 +83,9 @@ export class ArticlesController {
     // verify(@Param('id') id: string, @User() user: IUser) {
     //     return this.articlesService.verify(id, user);
     // }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    handleCron() {
+        return this.articlesService.markArticleAsUnverified();
+    }
 }

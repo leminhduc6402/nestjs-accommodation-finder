@@ -199,33 +199,37 @@ export class ArticlesService {
         return articles;
     }
 
-    verify(_id: string, user: IUser) {
+    verify(_id: string, status: string, user: IUser) {
         const expirationDate = new Date();
         expirationDate.setMonth(expirationDate.getMonth() + 1);
+        expirationDate.setDate(expirationDate.getDate() + 1);
+        expirationDate.setHours(0, 0, 0, 0);
 
-        return this.articleModel.updateOne(
-            {
-                _id,
-            },
-            {
-                status: articleStatusEnum.VERIFY,
-                expiredAt: expirationDate.setMonth(
-                    expirationDate.getMonth() + 1,
-                ),
-                updatedBy: user._id,
-            },
-        );
-    }
-
-    changeStatus(_id: string, status: string, user: IUser) {
         return this.articleModel.updateOne(
             {
                 _id,
             },
             {
                 status: status,
+                expiredAt: expirationDate.setMonth(expirationDate.getMonth()),
                 updatedBy: user._id,
             },
         );
+    }
+
+    async markArticleAsUnverified() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        today.setDate(today.getDate() + 1);
+        const updated = await this.articleModel.updateMany(
+            {
+                status: articleStatusEnum.VERIFY,
+                expiredAt: today,
+            },
+            {
+                status: articleStatusEnum.UNVERIFY,
+            },
+        );
+        return !!updated;
     }
 }
