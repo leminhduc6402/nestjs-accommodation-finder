@@ -86,12 +86,11 @@ export class VerificationService {
     async update(updateVerificationDto: UpdateVerificationDto, user: IUser) {
         const { id, status, feedBack } = updateVerificationDto;
         const verification = await this.verificationModel.findById(id);
-        const { articleId } = verification;
-        const article = await this.articleService.findOne(articleId + '');
-
-        if (!verification || !article) {
+        if (verification === null) {
             throw new NotFoundException();
         }
+        const { articleId } = verification;
+        const article = await this.articleService.findOne(articleId + '');
 
         if (
             article.article.status !== articleStatusEnum.VERIFY &&
@@ -101,7 +100,12 @@ export class VerificationService {
                 verification.status === verificationStatusEnum.PENDING &&
                 status === verificationStatusEnum.SUCCEED
             ) {
-                await this.articleService.changeStatus(
+                // await this.articleService.changeStatus(
+                //     articleId.toString(),
+                //     articleStatusEnum.VERIFY,
+                //     user,
+                // );
+                await this.articleService.verify(
                     articleId.toString(),
                     articleStatusEnum.VERIFY,
                     user,
