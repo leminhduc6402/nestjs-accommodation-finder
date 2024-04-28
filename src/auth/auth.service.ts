@@ -20,6 +20,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { MailService } from 'src/mail/mail.service';
 import { ChangePassword, ForgotPassword, VerifyDto } from './dto/auth-dto';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +31,7 @@ export class AuthService {
         private jwtService: JwtService,
         private configService: ConfigService,
         private mailService: MailService,
+        private roleService: RolesService,
     ) {}
 
     async validateUser(email: string, pass: string): Promise<any> {
@@ -38,12 +40,22 @@ export class AuthService {
             if (user.active === false) {
                 throw new ForbiddenException();
             }
+
             const isValid = this.usersService.isValidPassword(
                 pass,
                 user.password,
             );
             if (isValid === true) {
-                return user;
+                const userRole = user.role as unknown as {
+                    _id: string;
+                    name: string;
+                };
+                const temp = this.roleService.findOne(userRole._id);
+                const objectUser = {
+                    ...user.toObject(),
+                    permissions: (await temp).permissions ?? [],
+                };
+                return objectUser;
             }
         }
         return null;
@@ -82,7 +94,7 @@ export class AuthService {
             followers,
             followings,
             role,
-            // , permissions
+            permissions,
         } = user;
         const payload = {
             sub: 'token login',
@@ -117,7 +129,7 @@ export class AuthService {
                 followers,
                 followings,
                 role,
-                // permissions,
+                permissions,
             },
         };
     }

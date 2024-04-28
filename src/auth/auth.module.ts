@@ -17,11 +17,13 @@ import { join } from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from 'src/mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
         UsersModule,
+        RolesModule,
         MailModule,
         CacheModule.register(),
         PassportModule.register({ session: true }),

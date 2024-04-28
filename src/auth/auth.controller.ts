@@ -19,11 +19,15 @@ import { ChangePassword, ForgotPassword, VerifyDto } from './dto/auth-dto';
 import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { RolesService } from 'src/roles/roles.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(
+        private authService: AuthService,
+        private rolesService: RolesService,
+    ) {}
 
     @Public()
     @UseGuards(LocalAuthGuard)
@@ -51,7 +55,9 @@ export class AuthController {
     @ApiOperation({ summary: 'Get user information when logged in' })
     @ResponseMessage('Get user information')
     @Get('/account')
-    handleGetAccount(@User() user: IUser) {
+    async handleGetAccount(@User() user: IUser) {
+        const temp = (await this.rolesService.findOne(user.role._id)) as any;
+        user.permissions = temp.permissions;
         return { user };
     }
 
