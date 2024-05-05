@@ -19,6 +19,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { DatabasesModule } from './databases/databases.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { StatisticalModule } from './statistical/statistical.module';
 @Module({
     imports: [
         ScheduleModule.forRoot(),
@@ -55,6 +56,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         PermissionsModule,
         RolesModule,
         DatabasesModule,
+        StatisticalModule,
     ],
     controllers: [AppController],
     providers: [AppService],

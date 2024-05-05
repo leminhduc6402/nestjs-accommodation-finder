@@ -19,3 +19,9 @@ export enum articleStatusEnum {
     VERIFY = 'VERIFY',
     UNVERIFY = 'UNVERIFY',
 }
+
+export enum statisticalTypeEnum {
+    DAY = 'DAY',
+    MONTH = 'MONTH',
+    YEAR = 'YEAR',
+}
