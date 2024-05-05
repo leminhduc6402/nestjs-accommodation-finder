@@ -48,8 +48,7 @@ export class ArticlesController {
     @ResponseMessage('Get an article by id')
     @Get(':id')
     findOne(@Param('id') id: string) {
-        // return this.articlesService.findOne(id);
-        return this.articlesService.markArticleAsUnverified();
+        return this.articlesService.findOne(id);
     }
 
     @ApiOperation({ summary: 'Update an article' })
