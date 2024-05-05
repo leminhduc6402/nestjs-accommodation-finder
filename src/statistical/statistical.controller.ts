@@ -11,7 +11,11 @@ import { StatisticalService } from './statistical.service';
 import { StatisticalDto } from './dto/create-statistical.dto';
 import { UpdateStatisticalDto } from './dto/update-statistical.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Public, ResponseMessage } from 'src/customDecorator/customize';
+import {
+    Public,
+    ResponseMessage,
+    SkipCheckPermission,
+} from 'src/customDecorator/customize';
 
 @ApiTags('Statistical')
 @Controller('statistical')
@@ -23,7 +27,7 @@ export class StatisticalController {
         return this.statisticalService.create(statisticalDto);
     }
 
-    @Public()
+    @SkipCheckPermission()
     @ApiOperation({ summary: 'Statistics all' })
     @ResponseMessage('Statistics all')
     @Get()
@@ -31,7 +35,7 @@ export class StatisticalController {
         return this.statisticalService.findAll();
     }
 
-    @Public()
+    @SkipCheckPermission()
     @ApiOperation({ summary: 'Get user statistics' })
     @ResponseMessage('Get user statistics')
     @Get('users')
@@ -39,7 +43,7 @@ export class StatisticalController {
         return this.statisticalService.getUserStatistics();
     }
 
-    @Public()
+    @SkipCheckPermission()
     @ApiOperation({ summary: 'Get article statistics' })
     @ResponseMessage('Get article statistics')
     @Get('articles')
