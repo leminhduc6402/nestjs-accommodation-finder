@@ -92,22 +92,8 @@ export class StatisticalService {
                                 month: { $month: '$createdAt' },
                                 day: { $dayOfMonth: '$createdAt' },
                             },
+                            date: { $first: '$createdAt' },
                             quantity: { $sum: 1 },
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: {
-                                year: '$_id.year',
-                                month: '$_id.month',
-                            },
-                            days: {
-                                $push: {
-                                    day: '$_id.day',
-                                    quantity: '$quantity',
-                                },
-                            },
-                            total: { $sum: '$quantity' },
                         },
                     },
                     {
@@ -115,29 +101,45 @@ export class StatisticalService {
                             _id: 0,
                             year: '$_id.year',
                             month: '$_id.month',
-                            days: 1,
-                            total: 1,
+                            day: '$_id.day',
+                            date: '$date',
+                            quantity: 1,
                         },
                     },
-                    {
-                        $group: {
-                            _id: '$year',
-                            months: {
-                                $push: {
-                                    month: '$month',
-                                    days: '$days',
-                                    total: '$total',
-                                },
-                            },
-                        },
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            year: '$_id',
-                            months: 1,
-                        },
-                    },
+                    // {
+                    //     $group: {
+                    //         _id: {
+                    //             year: '$_id.year',
+                    //             month: '$_id.month',
+                    //         },
+                    //         days: {
+                    //             $push: {
+                    //                 day: '$_id.day',
+                    //                 quantity: '$quantity',
+                    //             },
+                    //         },
+                    //         total: { $sum: '$quantity' },
+                    //     },
+                    // },
+                    // {
+                    //     $group: {
+                    //         _id: '$year',
+                    //         months: {
+                    //             $push: {
+                    //                 month: '$month',
+                    //                 days: '$days',
+                    //                 total: '$total',
+                    //             },
+                    //         },
+                    //     },
+                    // },
+                    // {
+                    //     $project: {
+                    //         _id: 0,
+                    //         year: '$_id',
+                    //         months: 1,
+                    //     },
+                    // },
                 ];
                 break;
             case statisticalTypeEnum.MONTH:
@@ -160,23 +162,10 @@ export class StatisticalService {
                         },
                     },
                     {
-                        $group: {
-                            _id: '$_id.year',
-                            months: {
-                                $push: {
-                                    month: '$_id.month',
-                                    total: '$quantity',
-                                },
-                            },
-                            total: { $sum: '$quantity' },
-                        },
-                    },
-                    {
                         $project: {
                             _id: 0,
-                            year: '$_id',
-                            months: 1,
-                            total: 1,
+                            months: '$_id.month',
+                            quantity: 1,
                         },
                     },
                 ];
@@ -203,7 +192,7 @@ export class StatisticalService {
                         $project: {
                             _id: 0,
                             year: '$_id.year',
-                            total: '$quantity',
+                            quantity: 1,
                         },
                     },
                 ];
