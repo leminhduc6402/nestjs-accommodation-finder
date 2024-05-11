@@ -46,7 +46,7 @@ export class StatisticalController {
     @SkipCheckPermission()
     @ApiOperation({ summary: 'Get article statistics' })
     @ResponseMessage('Get article statistics')
-    @Get('articles')
+    @Post('articles')
     getArticleStatistics(@Body() statisticalDto: StatisticalDto) {
         return this.statisticalService.getArticleStatistics(statisticalDto);
     }
