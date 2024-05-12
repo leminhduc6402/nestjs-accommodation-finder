@@ -106,40 +106,6 @@ export class StatisticalService {
                             quantity: 1,
                         },
                     },
-                    // {
-                    //     $group: {
-                    //         _id: {
-                    //             year: '$_id.year',
-                    //             month: '$_id.month',
-                    //         },
-                    //         days: {
-                    //             $push: {
-                    //                 day: '$_id.day',
-                    //                 quantity: '$quantity',
-                    //             },
-                    //         },
-                    //         total: { $sum: '$quantity' },
-                    //     },
-                    // },
-                    // {
-                    //     $group: {
-                    //         _id: '$year',
-                    //         months: {
-                    //             $push: {
-                    //                 month: '$month',
-                    //                 days: '$days',
-                    //                 total: '$total',
-                    //             },
-                    //         },
-                    //     },
-                    // },
-                    // {
-                    //     $project: {
-                    //         _id: 0,
-                    //         year: '$_id',
-                    //         months: 1,
-                    //     },
-                    // },
                 ];
                 break;
             case statisticalTypeEnum.MONTH:
@@ -198,7 +164,10 @@ export class StatisticalService {
                 ];
                 break;
         }
-        return await this.articleModel.aggregate(aggregationPipeline);
+        const demo = await this.articleModel
+            .aggregate(aggregationPipeline)
+            .sort('day');
+        return demo;
     }
 
     create(statisticalDto: StatisticalDto) {

@@ -128,7 +128,7 @@ export class LandlordRequestService {
         return await this.landlordRequestModel
             .findOneAndUpdate(
                 { _id: id },
-                { status, feedBack, createdBy: user._id },
+                { status, feedBack, updatedBy: user._id },
                 { new: true },
             )
             .populate({

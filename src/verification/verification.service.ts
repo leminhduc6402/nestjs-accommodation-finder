@@ -100,11 +100,6 @@ export class VerificationService {
                 verification.status === verificationStatusEnum.PENDING &&
                 status === verificationStatusEnum.SUCCEED
             ) {
-                // await this.articleService.changeStatus(
-                //     articleId.toString(),
-                //     articleStatusEnum.VERIFY,
-                //     user,
-                // );
                 await this.articleService.verify(
                     articleId.toString(),
                     articleStatusEnum.VERIFY,
