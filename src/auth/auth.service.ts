@@ -96,6 +96,7 @@ export class AuthService {
             role,
             permissions,
         } = user;
+        console.log(user);
         const payload = {
             sub: 'token login',
             iss: 'from server',
@@ -208,17 +209,6 @@ export class AuthService {
                     phone,
                     followers,
                     followings,
-                    role,
-                    permissions: (await temp).permissions ?? [],
-                },
-            };
-            return {
-                access_token: this.jwtService.sign(payload),
-                // refresh_token,
-                user: {
-                    _id,
-                    fullName,
-                    email,
                     role,
                     permissions: (await temp).permissions ?? [],
                 },
