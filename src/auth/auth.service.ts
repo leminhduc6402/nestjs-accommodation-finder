@@ -155,7 +155,16 @@ export class AuthService {
         let user = await this.usersService.findUserByToken(refreshToken);
         if (user) {
             //update refresh token
-            const { _id, email, fullName, role } = user;
+            const {
+                _id,
+                email,
+                fullName,
+                avatar,
+                phone,
+                followers,
+                followings,
+                role,
+            } = user;
             const payload = {
                 sub: 'token refresh',
                 iss: 'from server',
@@ -189,7 +198,20 @@ export class AuthService {
                 sameSite: 'none',
                 secure: true,
             });
-
+            return {
+                access_token: this.jwtService.sign(payload),
+                user: {
+                    _id,
+                    fullName,
+                    email,
+                    avatar,
+                    phone,
+                    followers,
+                    followings,
+                    role,
+                    permissions: (await temp).permissions ?? [],
+                },
+            };
             return {
                 access_token: this.jwtService.sign(payload),
                 // refresh_token,
