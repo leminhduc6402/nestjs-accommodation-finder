@@ -172,8 +172,11 @@ export class AuthService {
                 _id.toString(),
             );
 
-            // const userRole = user.role as unknown as { _id: string; name: string };
-            // const temp = this.roleService.findOne(userRole._id);
+            const userRole = user.role as unknown as {
+                _id: string;
+                name: string;
+            };
+            const temp = this.roleService.findOne(userRole._id);
 
             // set refresh_token as cookies
             response.clearCookie('refresh_token');
@@ -195,7 +198,7 @@ export class AuthService {
                     fullName,
                     email,
                     role,
-                    // permissions: (await temp).permissions ?? []
+                    permissions: (await temp).permissions ?? [],
                 },
             };
         } else {
