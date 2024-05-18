@@ -97,7 +97,11 @@ export class UsersService {
     findUserByToken = async (refreshToken: string) => {
         return await this.userModel
             .findOne({ refreshToken })
-            .populate({ path: 'role', select: { name: 1 } });
+            .populate({ path: 'role', select: { name: 1 } })
+            .populate({
+                path: 'followings followers',
+                select: { fullName: 1, avatar: 1 },
+            });
     };
 
     checkValidFollower = async (followerId: string, userId: string) => {
@@ -330,5 +334,3 @@ export class UsersService {
         );
     }
 }
-
-
