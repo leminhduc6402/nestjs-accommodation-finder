@@ -96,7 +96,6 @@ export class AuthService {
             role,
             permissions,
         } = user;
-        console.log(user);
         const payload = {
             sub: 'token login',
             iss: 'from server',
