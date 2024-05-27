@@ -21,6 +21,7 @@ import { articleStatusEnum } from 'src/enum/enum';
 import { MailService } from 'src/mail/mail.service';
 import { SendNewArticleDto } from 'src/mail/dto/mail.dto';
 import { UsersService } from 'src/users/users.service';
+import * as natural from 'natural';
 
 @Injectable()
 export class ArticlesService {
@@ -220,6 +221,7 @@ export class ArticlesService {
     async markArticleAsUnverified() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
         today.setDate(today.getDate() + 1);
         const updated = await this.articleModel.updateMany(
             {
@@ -231,5 +233,32 @@ export class ArticlesService {
             },
         );
         return !!updated;
+    }
+
+    async getRecommendations(articleId: string) {
+        const articles = await this.articleModel.find();
+        const article = await this.articleModel.findById(articleId);
+
+        const tfidf = new natural.TfIdf();
+        articles.forEach((article) => tfidf.addDocument(article.title));
+
+        const articleTitle = new natural.TfIdf();
+        articleTitle.addDocument(article.title);
+        const scores = articles.map((article, index) => {
+            const similarityArray = tfidf.tfidfs(
+                article.title,
+                articleTitle[0],
+            );
+            if (!Array.isArray(similarityArray)) {
+                throw new Error('TF-IDF calculation failed');
+            }
+            const averageSimilarity =
+                similarityArray.reduce((acc, val) => acc + val, 0) /
+                similarityArray.length;
+            return { article, score: averageSimilarity };
+        });
+
+        scores.sort((a, b) => b.score - a.score);
+        return scores.slice(0, 5).map((score) => score.article);
     }
 }
