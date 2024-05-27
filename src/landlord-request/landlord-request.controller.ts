@@ -59,7 +59,13 @@ export class LandlordRequestController {
     @ApiOperation({ summary: 'Update a request' })
     @ResponseMessage('Update a request')
     @Patch()
-    update(@Body() updateLandlordRequestDto: UpdateLandlordRequestDto, @User() user: IUser) {
-        return this.landlordRequestService.update(updateLandlordRequestDto, user);
+    update(
+        @Body() updateLandlordRequestDto: UpdateLandlordRequestDto,
+        @User() user: IUser,
+    ) {
+        return this.landlordRequestService.update(
+            updateLandlordRequestDto,
+            user,
+        );
     }
 }

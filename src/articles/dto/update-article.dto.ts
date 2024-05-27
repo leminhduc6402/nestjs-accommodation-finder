@@ -37,13 +37,13 @@ export class UpdateArticleDto {
     longitude: number;
 
     @IsNotEmpty()
-    provinceCode: string;
+    provinceCode: number;
 
     @IsNotEmpty()
-    districtCode: string;
+    districtCode: number;
 
     @IsNotEmpty()
-    wardCode: string;
+    wardCode: number;
 
     @IsNotEmpty()
     provinceName: string;

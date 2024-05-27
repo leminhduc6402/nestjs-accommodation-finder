@@ -13,8 +13,6 @@ import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { GoogleStrategy } from './passport/google.strategy';
 import { SessionSerializer } from './serializers/serializer';
 import { FacebookStrategy } from './passport/facebook.strategy';
-import { join } from 'path';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from 'src/mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RolesModule } from 'src/roles/roles.module';

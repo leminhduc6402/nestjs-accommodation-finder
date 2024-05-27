@@ -30,15 +30,6 @@ export class LandlordRequestService {
         createLandlordRequestDto: CreateLandlordRequestDto,
         user: IUser,
     ) {
-        // const { dayOfBirth, dateOfIssue } = createLandlordRequestDto;
-
-        // const dayOfBirthConvert = new Date(dayOfBirth);
-        // const dateOfIssueConvert = new Date(dateOfIssue);
-
-        // dayOfBirthConvert.setMonth(dayOfBirthConvert.getMonth() + 1);
-        // dateOfIssueConvert.setMonth(dateOfIssueConvert.getMonth() + 1);
-        // console.log(dateOfIssueConvert);
-        // console.log(dayOfBirthConvert);
         const isValid = await this.landlordRequestModel
             .find({
                 createdBy: user._id,
@@ -54,8 +45,6 @@ export class LandlordRequestService {
         }
         const landlordRequest = this.landlordRequestModel.create({
             ...createLandlordRequestDto,
-            // dayOfBirth: dayOfBirthConvert,
-            // dateOfIssue: dateOfIssueConvert,
             createdBy: user._id,
         });
         return landlordRequest;

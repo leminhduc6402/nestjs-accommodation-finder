@@ -76,12 +76,13 @@ export class ArticlesController {
         return this.articlesService.findByLocation(+longitude, +latitude);
     }
 
-    // @ApiOperation({ summary: 'Verify the article' })
-    // @ResponseMessage('Verify the article')
-    // @Patch('verify/:id')
-    // verify(@Param('id') id: string, @User() user: IUser) {
-    //     return this.articlesService.verify(id, user);
-    // }
+    @Public()
+    @ApiOperation({ summary: 'Verify the article' })
+    @ResponseMessage('Verify the article')
+    @Get('getRecommodations/:id')
+    getRecommendations(@Param('id') id: string) {
+        return this.articlesService.getRecommendations(id);
+    }
 
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     handleCron() {
