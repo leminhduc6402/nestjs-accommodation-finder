@@ -77,8 +77,8 @@ export class ArticlesController {
     }
 
     @Public()
-    @ApiOperation({ summary: 'Verify the article' })
-    @ResponseMessage('Verify the article')
+    @ApiOperation({ summary: 'Get recommendation articles' })
+    @ResponseMessage('Get recommendation articles')
     @Get('getRecommodations/:id')
     getRecommendations(@Param('id') id: string) {
         return this.articlesService.getRecommendations(id);
