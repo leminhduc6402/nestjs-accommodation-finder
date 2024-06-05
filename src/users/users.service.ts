@@ -82,14 +82,14 @@ export class UsersService {
         if (isExist) {
             throw new BadRequestException(`Email: ${email} already exists`);
         }
-
+        const userRole = await this.roleModel.findOne({ name: USER });
         let newRegister = await this.userModel.create({
             fullName,
             email,
             avatar: avatar,
             active: true,
-            // role: userRole._id,
-            role: 'USER',
+            role: userRole._id,
+            // role: 'USER',
         });
         return newRegister;
     }

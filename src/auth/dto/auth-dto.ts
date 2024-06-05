@@ -34,3 +34,8 @@ export class ForgotPassword {
     @IsNotEmpty()
     newPassword: string;
 }
+export class LoginWithSocialAccountDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    access_token: string;
+}

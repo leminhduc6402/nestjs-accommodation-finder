@@ -236,7 +236,7 @@ export class ArticlesService {
     }
 
     async getRecommendations(articleId: string) {
-        const articles = await this.articleModel.find();
+        const articles = await this.articleModel.find(); 
         const article = await this.articleModel.findById(articleId);
 
         const tfidf = new natural.TfIdf();
@@ -252,6 +252,7 @@ export class ArticlesService {
             if (!Array.isArray(similarityArray)) {
                 throw new Error('TF-IDF calculation failed');
             }
+            
             const averageSimilarity =
                 similarityArray.reduce((acc, val) => acc + val, 0) /
                 similarityArray.length;

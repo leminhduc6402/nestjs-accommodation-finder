@@ -20,7 +20,7 @@ async function bootstrap() {
     app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
     app.useStaticAssets(join(__dirname, '..', 'public')); // access js, css, images
-    app.setBaseViewsDir(join(__dirname, '..', 'views')); // view
+    app.setBaseViewsDir(join(__dirname, '..', 'views')); // view 
     app.setViewEngine('ejs');
 
     app.useGlobalPipes(
@@ -35,7 +35,13 @@ async function bootstrap() {
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         preflightContinue: false,
         credentials: true,
-        allowedHeaders: 'Content-Type, Authorization, Set-Cookie, Cookie',
+        allowedHeaders: [
+            'Content-Type',
+            'Authorization',
+            'Set-Cookie',
+            'Cookie',
+            'x-no-retry',
+        ],
     });
 
     //config cookies
@@ -55,7 +61,10 @@ async function bootstrap() {
             resave: false,
             saveUninitialized: false,
             cookie: {
+                httpOnly: true,
                 maxAge: 60000 * 60,
+                sameSite: 'none',
+                secure: true,
             },
         }),
     );

@@ -19,8 +19,16 @@ import { Response } from 'express';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { MailService } from 'src/mail/mail.service';
-import { ChangePassword, ForgotPassword, VerifyDto } from './dto/auth-dto';
+import {
+    ChangePassword,
+    ForgotPassword,
+    LoginWithSocialAccountDto,
+    VerifyDto,
+} from './dto/auth-dto';
 import { RolesService } from 'src/roles/roles.service';
+import { HttpService } from '@nestjs/axios';
+import { map } from 'rxjs/operators';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +40,7 @@ export class AuthService {
         private configService: ConfigService,
         private mailService: MailService,
         private roleService: RolesService,
+        private httpService: HttpService,
     ) {}
 
     async validateUser(email: string, pass: string): Promise<any> {
@@ -84,6 +93,154 @@ export class AuthService {
         return await this.usersService.findOneByEmail(email);
     }
 
+    async loginWithFB(
+        loginWithSocialAccount: LoginWithSocialAccountDto,
+        response: Response,
+    ) {
+        const { access_token } = loginWithSocialAccount;
+
+        const body_id = await lastValueFrom(
+            this.httpService
+                .get(
+                    `https://graph.facebook.com/me?access_token=${access_token}`,
+                )
+                .pipe(map((response) => response.data)),
+        );
+        if (body_id) {
+            const { id } = body_id;
+            const body_info = await lastValueFrom(
+                this.httpService
+                    .get(
+                        `https://graph.facebook.com/${id}?fields=email,name,picture&access_token=${access_token}`,
+                    )
+                    .pipe(map((response) => response.data)),
+            );
+            const { name, picture, email } = body_info;
+            if (!email) {
+                throw new BadRequestException(
+                    'You need to grant email access.',
+                );
+            }
+            const emailFB = email;
+            const userExisted: any = await this.findUserByEmail(email);
+
+            const userRole = userExisted.role as unknown as {
+                _id: string;
+                name: string;
+            };
+            const temp = this.roleService.findOne(userRole._id);
+            if (!userExisted) {
+                const user: IUser = await this.validateUserWithSocial(
+                    emailFB,
+                    name,
+                    picture?.data?.url,
+                );
+                const {
+                    _id,
+                    email,
+                    fullName,
+                    avatar,
+                    phone,
+                    followers,
+                    followings,
+                    role,
+                    permissions,
+                } = user;
+                const payload = {
+                    sub: 'token login',
+                    iss: 'from server',
+                    _id,
+                    name,
+                    email,
+                    picture,
+                    role,
+                };
+
+                const refresh_token = this.createRefreshToken(payload);
+
+                //update user with refresh token
+                await this.usersService.updateUserToken(refresh_token, _id);
+
+                response.cookie('refresh_token', refresh_token, {
+                    httpOnly: true,
+                    maxAge: ms(
+                        this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+                    ),
+                    sameSite: 'none',
+                    secure: true,
+                });
+
+                response.status(200);
+                return {
+                    access_token: this.jwtService.sign(payload),
+                    user: {
+                        _id,
+                        fullName,
+                        email,
+                        avatar,
+                        phone,
+                        followers,
+                        followings,
+                        role,
+                        permissions,
+                    },
+                };
+            } else {
+                const {
+                    _id,
+                    email,
+                    fullName,
+                    avatar,
+                    phone,
+                    followers,
+                    followings,
+                    role,
+                    permissions,
+                } = userExisted;
+                const payload = {
+                    sub: 'token login',
+                    iss: 'from server',
+                    _id,
+                    name,
+                    email,
+                    picture,
+                    role,
+                };
+
+                const refresh_token = this.createRefreshToken(payload);
+
+                //update user with refresh token
+                await this.usersService.updateUserToken(refresh_token, _id);
+
+                response.cookie('refresh_token', refresh_token, {
+                    httpOnly: true,
+                    maxAge: ms(
+                        this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+                    ),
+                    sameSite: 'none',
+                    secure: true,
+                });
+
+                response.status(200);
+                return {
+                    access_token: this.jwtService.sign(payload),
+                    user: {
+                        _id,
+                        fullName,
+                        email,
+                        avatar,
+                        phone,
+                        followers,
+                        followings,
+                        role,
+                        permissions: (await temp).permissions ?? [],
+                    },
+                };
+            }
+        }
+        throw new BadRequestException('Login with FB error!!!');
+    }
+
     async login(user: IUser, response: Response) {
         const {
             _id,
@@ -117,6 +274,7 @@ export class AuthService {
             sameSite: 'none',
             secure: true,
         });
+
         response.status(200);
         return {
             access_token: this.jwtService.sign(payload),
