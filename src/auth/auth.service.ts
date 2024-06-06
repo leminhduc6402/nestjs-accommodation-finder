@@ -92,6 +92,13 @@ export class AuthService {
     async findUserByEmail(email: string) {
         return await this.usersService.findOneByEmail(email);
     }
+    async loginWithGG(
+        loginWithSocialAccount: LoginWithSocialAccountDto,
+        response: Response,
+    ) {
+        const { access_token } = loginWithSocialAccount;
+        return access_token;
+    }
 
     async loginWithFB(
         loginWithSocialAccount: LoginWithSocialAccountDto,
@@ -195,7 +202,6 @@ export class AuthService {
                     followers,
                     followings,
                     role,
-                    permissions,
                 } = userExisted;
                 const payload = {
                     sub: 'token login',
