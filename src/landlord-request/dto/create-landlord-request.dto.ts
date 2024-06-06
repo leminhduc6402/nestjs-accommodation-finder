@@ -3,6 +3,9 @@ import { genderEnum, landlordRequestStatusEnum } from 'src/enum/enum';
 
 export class CreateLandlordRequestDto {
     @IsNotEmpty()
+    images: string[];
+    
+    @IsNotEmpty()
     personalID: string;
 
     @IsNotEmpty()
