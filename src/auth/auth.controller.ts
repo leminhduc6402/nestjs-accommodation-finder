@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Get,
@@ -15,7 +16,12 @@ import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { RegisterUserDto, UserLoginDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
 import { AuthService } from './auth.service';
-import { ChangePassword, ForgotPassword, VerifyDto } from './dto/auth-dto';
+import {
+    ChangePassword,
+    ForgotPassword,
+    LoginWithSocialAccountDto,
+    VerifyDto,
+} from './dto/auth-dto';
 import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -70,6 +76,9 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response,
     ) {
         const refreshToken = req.cookies['refresh_token'];
+        if (!refreshToken) {
+            throw new BadRequestException('Not found refresh token');
+        }
         return this.authService.processNewToken(refreshToken, response);
     }
 
@@ -103,15 +112,17 @@ export class AuthController {
     }
 
     @Public()
-    @UseGuards(FacebookAuthGuard)
     @ResponseMessage('Login with Facebook account')
     @Get('facebook')
-    handleLoginWithFB() {
-        return 'Facebook Authentication';
+    handleLoginWithFB(
+        @Body() loginWithSocialAccountDto: LoginWithSocialAccountDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        return this.authService.loginWithFB(loginWithSocialAccountDto, response);
     }
 
     @Public()
-    @UseGuards(FacebookAuthGuard)
+    //@UseGuards(FacebookAuthGuard)
     @ResponseMessage('Login with Facebook account')
     @Get('facebook/callback')
     handleRedirectFB(

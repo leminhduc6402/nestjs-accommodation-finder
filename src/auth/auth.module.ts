@@ -16,6 +16,7 @@ import { FacebookStrategy } from './passport/facebook.strategy';
 import { MailModule } from 'src/mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RolesModule } from 'src/roles/roles.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { RolesModule } from 'src/roles/roles.module';
             }),
             inject: [ConfigService],
         }),
+        HttpModule
     ],
     providers: [
         AuthService,
