@@ -62,6 +62,43 @@ export class FilesService {
         return { path: fileInfo.path };
     }
 
+    async uploadBase64File(base64: string, user: IUser) {
+        console.log(base64)
+        const key = `${uuidv4()}-jpeg`;
+        const buf = Buffer.from(
+            base64.replace(/^data:image\/\w+;base64,/, ''),
+            'base64',
+        );
+
+        const result = await this.s3Client.send(
+            new PutObjectCommand({
+                Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+                Key: key,
+                Body: buf,
+                ACL: 'public-read',
+                ContentEncoding: 'base64',
+                ContentType: 'image/jpeg',
+            }),
+        );
+        if (result.$metadata.httpStatusCode !== 200) {
+            throw new BadRequestException(
+                'Something wrong when upload file!!!',
+            );
+        }
+
+        const fileInfo = await this.fileModel.create({
+            name: key,
+            mimeType: 'image/jpeg',
+            size: -1,
+            path: `https://${this.configService.get(
+                'AWS_PUBLIC_BUCKET_NAME',
+            )}.s3.amazonaws.com/${key}`,
+            createdBy: user._id,
+        });
+
+        return { path: fileInfo.path };
+    }
+
     async findAll(currentPage: number, limit: number, qs: string) {
         const { filter, sort, population, projection } = aqp(qs);
         delete filter.current;

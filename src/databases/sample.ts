@@ -214,6 +214,20 @@ export const INIT_PERMISSIONS = [
     },
     //FILE
     {
+        "_id": "6663f709bf420f28cd067897",
+        "name": "Upload base64 file",
+        "apiPath": "/api/v1/files/uploadBase64",
+        "method": "POST",
+        "module": "FILES",
+        "isDelete": false,
+        "deletedAt": null,
+        "createdAt": "2024-04-24T14:11:16.243Z",
+        "createdBy": "662ded47fadbff331f7d9db2",
+        "updatedAt": "2024-04-24T14:11:16.243Z",
+        "updatedBy": "662ded47fadbff331f7d9db2",
+        "__v": 0,
+    },
+        {
         "_id": "648ad4d9dafdb9754f40b85e",
         "name": "Upload single file",
         "apiPath": "/api/v1/files/upload",

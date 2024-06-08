@@ -87,7 +87,7 @@ export class RolesService {
             throw new BadRequestException('Not found role');
         }
         const { name, description, isActive, permissions } = updateRoleDto;
-        if (name === ADMIN) {
+        if (name === ADMIN && user.email !==  'leminhduc6402@gmail.com') {
             throw new BadRequestException('Can not update this role');
         }
         const updated = await this.roleModel.findByIdAndUpdate(

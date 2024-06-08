@@ -1,4 +1,4 @@
-import { IsEnum, IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { verificationStatusEnum } from 'src/enum/enum';
 
 export class UpdateVerificationDto {
@@ -9,5 +9,6 @@ export class UpdateVerificationDto {
     @IsEnum(verificationStatusEnum)
     status: string;
 
+    @IsString()
     feedBack: string;
 }

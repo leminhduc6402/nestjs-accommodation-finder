@@ -1,4 +1,5 @@
 import {
+    Body,
     Controller,
     Delete,
     Get,
@@ -19,6 +20,7 @@ import {
     ApiParam,
     ApiTags,
 } from '@nestjs/swagger';
+import { CreateBase64FileDto } from './dto/create-base64-file.dto';
 
 @ApiTags('Files')
 @Controller('files')
@@ -46,6 +48,17 @@ export class FilesController {
         @User() user: IUser,
     ) {
         return await this.filesService.upload(file, user);
+    }
+
+    @ApiOperation({ summary: 'Upload base64 file' })
+    @ResponseMessage('Upload base64 file')
+    @Post('uploadBase64')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadBase64File(
+        @Body() file: CreateBase64FileDto,
+        @User() user: IUser,
+    ) {
+        return await this.filesService.uploadBase64File(file.base64, user);
     }
 
     @ApiOperation({ summary: 'Get all article with pagination' })

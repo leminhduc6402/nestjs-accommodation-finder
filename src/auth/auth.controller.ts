@@ -94,12 +94,15 @@ export class AuthController {
 
     @Public()
     @ResponseMessage('Login with google account')
-    @Get('google')
+    @Post('google')
     handleLoginWithGoogle(
         @Body() loginWithSocialAccountDto: LoginWithSocialAccountDto,
         @Res({ passthrough: true }) response: Response,
     ) {
-        return 'Google Authentication';
+        return this.authService.loginWithGoogle(
+            loginWithSocialAccountDto,
+            response,
+        );
     }
 
     @Public()
@@ -115,7 +118,7 @@ export class AuthController {
 
     @Public()
     @ResponseMessage('Login with Facebook account')
-    @Get('facebook')
+    @Post('facebook')
     handleLoginWithFB(
         @Body() loginWithSocialAccountDto: LoginWithSocialAccountDto,
         @Res({ passthrough: true }) response: Response,
