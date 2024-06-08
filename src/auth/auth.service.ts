@@ -100,6 +100,155 @@ export class AuthService {
         return access_token;
     }
 
+    async loginWithGoogle(
+        loginWithSocialAccount: LoginWithSocialAccountDto,
+        response: Response,
+    ) {
+        const { access_token } = loginWithSocialAccount;
+
+        const googleResponse = await lastValueFrom(
+            this.httpService
+                .get(
+                    `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
+                )
+                .pipe(map((response) => response.data)),
+        );
+
+        const { name, picture, email } = googleResponse;
+
+        if (!email) {
+            throw new BadRequestException('You need to grant email access.');
+        }
+
+        const emailGoogle = email;
+        const userExisted: any = await this.findUserByEmail(email);
+
+        if (!userExisted) {
+            const user: IUser = await this.validateUserWithSocial(
+                emailGoogle,
+                name,
+                picture,
+            );
+
+            const newUser: any = await this.findUserByEmail(emailGoogle);
+
+            const userRole = user.role as unknown as {
+                _id: string;
+                name: string;
+            };
+
+            const temp = this.roleService.findOne(userRole._id);
+
+            const {
+                _id,
+                email,
+                fullName,
+                avatar,
+                phone,
+                followers,
+                followings,
+                role,
+            } = newUser;
+            const payload = {
+                sub: 'token login',
+                iss: 'from server',
+                _id,
+                name,
+                email,
+                picture,
+                role,
+            };
+
+            const refresh_token = this.createRefreshToken(payload);
+
+            //update user with refresh token
+            await this.usersService.updateUserToken(refresh_token, _id);
+
+            response.cookie('refresh_token', refresh_token, {
+                httpOnly: true,
+                maxAge: ms(
+                    this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+                ),
+                sameSite: 'none',
+                secure: true,
+            });
+
+            response.status(200);
+            return {
+                access_token: this.jwtService.sign(payload),
+                user: {
+                    _id,
+                    fullName,
+                    email,
+                    avatar,
+                    phone,
+                    followers,
+                    followings,
+                    role,
+                    permissions: (await temp).permissions ?? [],
+                },
+            };
+        } else {
+            const userRole = userExisted.role as unknown as {
+                _id: string;
+                name: string;
+            };
+
+            const temp = this.roleService.findOne(userRole._id);
+
+            const {
+                _id,
+                email,
+                fullName,
+                avatar,
+                phone,
+                followers,
+                followings,
+                role,
+            } = userExisted;
+
+            const payload = {
+                sub: 'token login',
+                iss: 'from server',
+                _id,
+                name,
+                email,
+                picture,
+                role,
+            };
+
+            const refresh_token = this.createRefreshToken(payload);
+
+            //update user with refresh token
+            await this.usersService.updateUserToken(refresh_token, _id);
+
+            response.cookie('refresh_token', refresh_token, {
+                httpOnly: true,
+                maxAge: ms(
+                    this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+                ),
+                sameSite: 'none',
+                secure: true,
+            });
+
+            response.status(200);
+            return {
+                access_token: this.jwtService.sign(payload),
+                user: {
+                    _id,
+                    fullName,
+                    email,
+                    avatar,
+                    phone,
+                    followers,
+                    followings,
+                    role,
+                    permissions: (await temp).permissions ?? [],
+                },
+            };
+        }
+    }
+
     async loginWithFB(
         loginWithSocialAccount: LoginWithSocialAccountDto,
         response: Response,
@@ -131,17 +280,22 @@ export class AuthService {
             const emailFB = email;
             const userExisted: any = await this.findUserByEmail(email);
 
-            const userRole = userExisted.role as unknown as {
-                _id: string;
-                name: string;
-            };
-            const temp = this.roleService.findOne(userRole._id);
             if (!userExisted) {
                 const user: IUser = await this.validateUserWithSocial(
                     emailFB,
                     name,
                     picture?.data?.url,
                 );
+
+                 const newUser: any = await this.findUserByEmail(emailFB);
+
+                 const userRole = user.role as unknown as {
+                     _id: string;
+                     name: string;
+                 };
+
+                 const temp = this.roleService.findOne(userRole._id);
+
                 const {
                     _id,
                     email,
@@ -152,7 +306,7 @@ export class AuthService {
                     followings,
                     role,
                     permissions,
-                } = user;
+                } = newUser;
                 const payload = {
                     sub: 'token login',
                     iss: 'from server',
@@ -189,10 +343,17 @@ export class AuthService {
                         followers,
                         followings,
                         role,
-                        permissions,
+                        permissions: (await temp).permissions ?? [],
                     },
                 };
             } else {
+                const userRole = userExisted.role as unknown as {
+                    _id: string;
+                    name: string;
+                };
+
+                const temp = this.roleService.findOne(userRole._id);
+
                 const {
                     _id,
                     email,

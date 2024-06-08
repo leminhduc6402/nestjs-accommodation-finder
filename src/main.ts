@@ -10,6 +10,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from './core/transform.interceptor';
 import session from 'express-session';
 import passport from 'passport';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -20,7 +21,7 @@ async function bootstrap() {
     app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
     app.useStaticAssets(join(__dirname, '..', 'public')); // access js, css, images
-    app.setBaseViewsDir(join(__dirname, '..', 'views')); // view 
+    app.setBaseViewsDir(join(__dirname, '..', 'views')); // view
     app.setViewEngine('ejs');
 
     app.useGlobalPipes(
@@ -70,6 +71,8 @@ async function bootstrap() {
     );
     app.use(passport.initialize());
     app.use(passport.session());
+    app.use(bodyParser.json({ limit: '50mb' }));
+    app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
     // Config Swagger
     const config = new DocumentBuilder()

@@ -28,6 +28,9 @@ export class LandlordRequest {
     @Prop({ required: true })
     placeOfIssue: string;
 
+    @Prop({ required: true })
+    images: [string, string, string]
+
     @Prop({ required: true, enum: landlordRequestStatusEnum })
     status: string;
 
