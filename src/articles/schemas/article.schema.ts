@@ -47,12 +47,8 @@ export class Article {
         wardName: string;
     };
 
-    @Prop({ type: Object })
-    attributes: {
-        _id: string;
-        name: string;
-        type: string;
-    }[];
+    @Prop()
+    attributes: [string];
 
     @Prop({ type: Object })
     location: {

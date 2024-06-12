@@ -14,8 +14,11 @@ export class SubcategoriesService {
         @InjectModel(SubCategory.name)
         private subCategoryModel: SoftDeleteModel<SubCategoryDocument>,
     ) {}
-    create(createSubcategoryDto: CreateSubcategoryDto) {
-        return 'This action adds a new subcategory';
+    async create(createSubcategoryDto: CreateSubcategoryDto, user: IUser) {
+        return await this.subCategoryModel.create({
+            ...createSubcategoryDto,
+            createdBy: user._id,
+        });
     }
 
     async findAll(currentPage: number, limit: number, qs: string) {

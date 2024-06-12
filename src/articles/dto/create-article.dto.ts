@@ -22,11 +22,7 @@ export class CreateArticleDto {
 
     @IsNotEmpty()
     @IsArray()
-    attributes: {
-        _id: string;
-        name: string;
-        type: string;
-    }[];
+    attributes: [string];
 
     @IsNotEmpty()
     quantity: number;

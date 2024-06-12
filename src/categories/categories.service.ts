@@ -11,12 +11,15 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { SubCategory } from 'src/subcategories/schemas/subcategory.schema';
 
 @Injectable()
 export class CategoriesService {
     constructor(
         @InjectModel(Category.name)
         private categoryModel: SoftDeleteModel<CategoryDocument>,
+        @InjectModel(SubCategory.name)
+        private subCategoryModel: SoftDeleteModel<CategoryDocument>,
     ) {}
 
     async create(createCategoryDto: CreateCategoryDto, user: IUser) {
@@ -70,10 +73,19 @@ export class CategoriesService {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new BadRequestException('Not found category with id');
         }
-        return await this.categoryModel.findById(id).populate({
+        const subcategories = await this.subCategoryModel
+            .find({
+                categoryId: id,
+            })
+            .select({ name: 1, type: 1, active: 1, categoryId: 1 });
+        const category = await this.categoryModel.findById(id).populate({
             path: 'createdBy',
             select: { fullName: 1, avatar: 1 },
         });
+        return {
+            category,
+            subcategories,
+        };
     }
 
     async update(
