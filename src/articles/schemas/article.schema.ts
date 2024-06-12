@@ -20,7 +20,6 @@ export class Article {
         required: true,
     })
     categoryId: mongoose.Schema.Types.ObjectId;
-    // categoryId: string;
 
     @Prop({ required: true })
     price: number;
@@ -31,7 +30,7 @@ export class Article {
     @Prop({ required: true })
     quantity: number;
 
-    @Prop({enum: ['UNVERIFY', 'VERIFIED']})
+    @Prop({ enum: ['UNVERIFY', 'VERIFIED'] })
     status: string;
 
     @Prop()
@@ -49,9 +48,16 @@ export class Article {
     };
 
     @Prop({ type: Object })
+    attributes: {
+        _id: string;
+        name: string;
+        type: string;
+    }[];
+
+    @Prop({ type: Object })
     location: {
         coordinates: number[];
-        type: string;   
+        type: string;
     };
 
     @Prop({ required: true })
