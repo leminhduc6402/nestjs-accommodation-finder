@@ -11,7 +11,7 @@ import {
 import { SubcategoriesService } from './subcategories.service';
 import { CreateSubcategoryDto } from './dto/create-subcategory.dto';
 import { UpdateSubcategoryDto } from './dto/update-subcategory.dto';
-import { ResponseMessage, User } from 'src/customDecorator/customize';
+import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { IUser } from 'src/users/users.interface';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -27,6 +27,7 @@ export class SubcategoriesController {
         return this.subcategoriesService.create(createSubcategoryDto);
     }
 
+    @Public()
     @ApiOperation({ summary: 'Fetch all SubCategory with paginate' })
     @ResponseMessage('Fetch all SubCategory with paginate')
     @Get()
@@ -37,7 +38,8 @@ export class SubcategoriesController {
     ) {
         return this.subcategoriesService.findAll(+currentPage, +limit, qs);
     }
-
+    
+    @Public()
     @ApiOperation({ summary: 'Fetch SubCategory by category id' })
     @ResponseMessage('Fetch SubCategory by category id')
     @Get(':id')
