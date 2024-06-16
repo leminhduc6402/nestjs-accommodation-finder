@@ -11,12 +11,15 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { SubCategory } from 'src/subcategories/schemas/subcategory.schema';
 
 @Injectable()
 export class CategoriesService {
     constructor(
         @InjectModel(Category.name)
         private categoryModel: SoftDeleteModel<CategoryDocument>,
+        @InjectModel(SubCategory.name)
+        private subCategoryModel: SoftDeleteModel<CategoryDocument>,
     ) {}
 
     async create(createCategoryDto: CreateCategoryDto, user: IUser) {
@@ -48,11 +51,7 @@ export class CategoriesService {
             .skip(offset)
             .limit(defaultLimit)
             .sort(sort as any)
-            .populate({
-                ...population,
-                path: 'createdBy updatedBy',
-                select: { fullName: 1, avatar: 1, email: 1, role: 1 },
-            })
+            .populate(population)
             .exec();
 
         return {
@@ -70,10 +69,17 @@ export class CategoriesService {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new BadRequestException('Not found category with id');
         }
-        return await this.categoryModel.findById(id).populate({
-            path: 'createdBy',
-            select: { fullName: 1, avatar: 1 },
-        });
+        const category = await this.categoryModel
+            .findById(id)
+            .populate({
+                path: 'createdBy',
+                select: { fullName: 1, avatar: 1 },
+            })
+            .populate({
+                path: 'subCategories',
+                select: { name: 1, type: 1 },
+            });
+        return category;
     }
 
     async update(
@@ -85,14 +91,14 @@ export class CategoriesService {
         if (!category) {
             throw new NotFoundException();
         }
-        const { name } = updateCategoryDto;
+        const { name, subCategories } = updateCategoryDto;
 
         const isDuplicate = await this.categoryModel.findOne({ name });
         if (isDuplicate)
             throw new BadRequestException(`Name: ${name} already exists`);
         const updated = await this.categoryModel.findByIdAndUpdate(
             { _id },
-            { name },
+            { name, subCategories, updatedBy: user._id },
             { new: true },
         );
         return updated;
@@ -105,10 +111,7 @@ export class CategoriesService {
         await this.categoryModel.updateOne(
             { _id: id },
             {
-                deletedBy: {
-                    _id: user._id,
-                    email: user.email,
-                },
+                deletedBy: user._id,
             },
         );
         return this.categoryModel.softDelete({ _id: id });

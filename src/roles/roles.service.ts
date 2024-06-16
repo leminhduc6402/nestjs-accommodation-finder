@@ -41,7 +41,7 @@ export class RolesService {
 
         delete filter.current;
         delete filter.pageSize;
-
+        
         let offset = (+currentPage - 1) * +limit;
         let defaultLimit = +limit ? +limit : 10;
         const totalItems = (await this.roleModel.find(filter)).length;
@@ -87,7 +87,7 @@ export class RolesService {
             throw new BadRequestException('Not found role');
         }
         const { name, description, isActive, permissions } = updateRoleDto;
-        if (name === ADMIN && user.email !==  'leminhduc6402@gmail.com') {
+        if (name === ADMIN && user.email !== 'leminhduc6402@gmail.com') {
             throw new BadRequestException('Can not update this role');
         }
         const updated = await this.roleModel.findByIdAndUpdate(

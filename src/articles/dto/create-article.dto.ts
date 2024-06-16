@@ -21,6 +21,10 @@ export class CreateArticleDto {
     status: string;
 
     @IsNotEmpty()
+    @IsArray()
+    attributes: [string];
+
+    @IsNotEmpty()
     quantity: number;
 
     @IsNotEmpty()

@@ -1,20 +1,27 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Date, HydratedDocument } from 'mongoose';
-import { SubCategory } from 'src/subcategories/schemas/subcategory.schema';
+import { Category } from 'src/categories/schemas/category.schema';
 import { User } from 'src/users/schemas/user.schema';
 
-export type CategoryDocument = HydratedDocument<Category>;
+export type SubCategoryDocument = HydratedDocument<SubCategory>;
 
 @Schema({ timestamps: true })
-export class Category {
+export class SubCategory {
     @Prop()
     name: string;
 
     @Prop()
     active: boolean;
 
-    @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: SubCategory.name })
-    subCategories: SubCategory[];
+    @Prop()
+    type: string;
+
+    // @Prop({
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: Category.name,
+    //     required: true,
+    // })
+    // categoryId: mongoose.Schema.Types.ObjectId;
 
     @Prop({ type: Date })
     createdAt: Date;
@@ -38,4 +45,4 @@ export class Category {
     isDelete: boolean;
 }
 
-export const CategorySchema = SchemaFactory.createForClass(Category);
+export const SubCategorySchema = SchemaFactory.createForClass(SubCategory);
