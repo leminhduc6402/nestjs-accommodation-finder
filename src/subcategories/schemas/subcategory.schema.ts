@@ -16,12 +16,12 @@ export class SubCategory {
     @Prop()
     type: string;
 
-    @Prop({
-        type: mongoose.Schema.Types.ObjectId,
-        ref: Category.name,
-        required: true,
-    })
-    categoryId: mongoose.Schema.Types.ObjectId;
+    // @Prop({
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: Category.name,
+    //     required: true,
+    // })
+    // categoryId: mongoose.Schema.Types.ObjectId;
 
     @Prop({ type: Date })
     createdAt: Date;

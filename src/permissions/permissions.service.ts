@@ -102,6 +102,6 @@ export class PermissionsService {
                 deletedBy: user._id,
             },
         );
-        return this.permissionModel.deleteOne({ _id: id });
+        return this.permissionModel.softDelete({ _id: id });
     }
 }

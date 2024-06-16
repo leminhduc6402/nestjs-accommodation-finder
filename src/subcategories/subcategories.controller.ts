@@ -60,7 +60,7 @@ export class SubcategoriesController {
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.subcategoriesService.remove(+id);
+    remove(@Param('id') id: string, @User() user: IUser) {
+        return this.subcategoriesService.remove(id, user);
     }
 }

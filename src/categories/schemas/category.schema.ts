@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Date, HydratedDocument } from 'mongoose';
+import { SubCategory } from 'src/subcategories/schemas/subcategory.schema';
 import { User } from 'src/users/schemas/user.schema';
 
 export type CategoryDocument = HydratedDocument<Category>;
@@ -11,6 +12,9 @@ export class Category {
 
     @Prop()
     active: boolean;
+
+    @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: SubCategory.name })
+    subCategories: SubCategory[];
 
     @Prop({ type: Date })
     createdAt: Date;

@@ -61,8 +61,10 @@ export class SubcategoriesService {
         return subcategories;
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} subcategory`;
+    async findOne(id: string) {
+        if (!mongoose.Types.ObjectId.isValid(id))
+            throw new BadRequestException('Not found permission');
+        return await this.subCategoryModel.findById(id);
     }
 
     async update(
@@ -81,7 +83,16 @@ export class SubcategoriesService {
         return updated;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} subcategory`;
+    async remove(id: string, user: IUser) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return 'not found permission';
+        }
+        await this.subCategoryModel.updateOne(
+            { _id: id },
+            {
+                deletedBy: user._id,
+            },
+        );
+        return this.subCategoryModel.softDelete({ _id: id });
     }
 }

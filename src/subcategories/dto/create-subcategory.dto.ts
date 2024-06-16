@@ -10,6 +10,6 @@ export class CreateSubcategoryDto {
     @IsNotEmpty()
     type: string;
 
-    @IsNotEmpty()
-    categoryId: string;
+    // @IsNotEmpty()
+    // categoryId: string;
 }
