@@ -89,3 +89,11 @@ export class ArticleQueryString {
     @ApiProperty({ required: false })
     wardCode: number;
 }
+
+export class RecommendationDto {
+    @IsNotEmpty()
+    articleId: string
+
+    // @IsNotEmpty()
+    // categoryId: string
+}

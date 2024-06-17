@@ -14,7 +14,11 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { Public, ResponseMessage, User } from 'src/customDecorator/customize';
 import { IUser } from 'src/users/users.interface';
 import { ArticlesService } from './articles.service';
-import { ArticleQueryString, CreateArticleDto } from './dto/create-article.dto';
+import {
+    ArticleQueryString,
+    CreateArticleDto,
+    RecommendationDto,
+} from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 @ApiTags('Articles')
