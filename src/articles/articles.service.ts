@@ -310,6 +310,7 @@ export class ArticlesService {
         return termCount / words.length;
     }
 
+    // Hàm tính idf
     inverseDocumentFrequency(
         term: string,
         docs: { _id: string; words: string[] }[],
@@ -320,6 +321,7 @@ export class ArticlesService {
         return Math.log(docs.length / (1 + numDocsWithTerm));
     }
 
+    // Hàm tính tf-idf
     calculateTfIdf(
         selectedArticleWords: string[],
         articleWords: string[],

@@ -7,15 +7,12 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import aqp from 'api-query-params';
 import { IUser } from 'src/users/users.interface';
-import { Category, CategoryDocument } from 'src/categories/schemas/category.schema';
 
 @Injectable()
 export class SubcategoriesService {
     constructor(
         @InjectModel(SubCategory.name)
         private subCategoryModel: SoftDeleteModel<SubCategoryDocument>,
-        @InjectModel(Category.name)
-        private categoryModel: SoftDeleteModel<CategoryDocument>,
     ) {}
     async create(createSubcategoryDto: CreateSubcategoryDto, user: IUser) {
         return await this.subCategoryModel.create({
@@ -58,14 +55,16 @@ export class SubcategoriesService {
         if (!mongoose.Types.ObjectId.isValid(categoryId)) {
             throw new BadRequestException('Must be ObjectId');
         }
-        const subcategories = (await this.categoryModel.findById(categoryId).populate('subCategories')).subCategories
-        return subcategories;
+        return false;
     }
 
     async findOne(id: string) {
         if (!mongoose.Types.ObjectId.isValid(id))
             throw new BadRequestException('Not found permission');
-        return await this.subCategoryModel.findById(id);
+        return await this.subCategoryModel.findById(id).populate({
+            path: 'createdBy',
+            select: { fullName: 1, avatar: 1, email: 1 },
+        });
     }
 
     async update(

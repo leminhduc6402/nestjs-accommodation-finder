@@ -45,7 +45,7 @@ export class SubcategoriesController {
     @ResponseMessage('Fetch SubCategory by category id')
     @Get(':id')
     findOne(@Param('id') id: string) {
-        return this.subcategoriesService.findAllByCategoryId(id);
+        return this.subcategoriesService.findOne(id);
     }
 
     @ApiOperation({ summary: 'Update a SubCategory' })
