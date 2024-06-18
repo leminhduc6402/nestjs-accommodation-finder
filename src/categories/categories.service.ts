@@ -93,9 +93,6 @@ export class CategoriesService {
         }
         const { name, subCategories } = updateCategoryDto;
 
-        const isDuplicate = await this.categoryModel.findOne({ name });
-        if (isDuplicate)
-            throw new BadRequestException(`Name: ${name} already exists`);
         const updated = await this.categoryModel.findByIdAndUpdate(
             { _id },
             { name, subCategories, updatedBy: user._id },

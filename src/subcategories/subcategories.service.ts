@@ -55,16 +55,16 @@ export class SubcategoriesService {
         if (!mongoose.Types.ObjectId.isValid(categoryId)) {
             throw new BadRequestException('Must be ObjectId');
         }
-        const subcategories = await this.subCategoryModel.findById({
-            categoryId,
-        });
-        return subcategories;
+        return false;
     }
 
     async findOne(id: string) {
         if (!mongoose.Types.ObjectId.isValid(id))
             throw new BadRequestException('Not found permission');
-        return await this.subCategoryModel.findById(id);
+        return await this.subCategoryModel.findById(id).populate({
+            path: 'createdBy',
+            select: { fullName: 1, avatar: 1, email: 1 },
+        });
     }
 
     async update(
