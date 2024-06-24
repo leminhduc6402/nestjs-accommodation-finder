@@ -94,7 +94,6 @@ export class ArticlesService {
         const { filter, sort, population, projection } = aqp(qs);
         delete filter.current;
         delete filter.pageSize;
-        console.log(filter);
         let offset = (+currentPage - 1) * +limit;
         let defaultLimit = +limit ? +limit : 10;
         const totalItems = (await this.articleModel.find(filter)).length;
@@ -298,9 +297,14 @@ export class ArticlesService {
         // Lấy ra 5 ID đầu tiên từ các bài viết đã lọc và sắp xếp
         const ids = filteredScores.slice(0, 5).map((article) => article._id);
 
-        const recommendationArticles = await this.articleModel.find({
-            _id: ids,
-        });
+        const recommendationArticles = await this.articleModel
+            .find({
+                _id: ids,
+            })
+            .populate({
+                path: 'createdBy',
+                select: { fullName: 1, avatar: 1 },
+            });
         return recommendationArticles;
     }
 
