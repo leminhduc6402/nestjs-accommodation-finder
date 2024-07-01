@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsPhoneNumber } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 export class UpdateUserDto {
@@ -16,13 +16,16 @@ export class UpdateUserDto {
     email: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     avatar: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     @IsPhoneNumber('VN')
     phone: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     @IsNotEmpty()
     role: string;
 
@@ -30,29 +33,38 @@ export class UpdateUserDto {
     active?: boolean;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     streetAddress?: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     latitude?: number;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     longitude?: number;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     provinceCode?: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     districtCode?: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     wardCode?: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     provinceName?: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     districtName?: string;
 
     @ApiProperty({ required: false })
+    @IsOptional()
     wardName?: string;
 }

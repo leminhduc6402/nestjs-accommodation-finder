@@ -74,7 +74,7 @@ export class RolesService {
             .findById(id)
             .populate({
                 path: 'permissions',
-                select: { _id: 1, apiPath: 1, name: 1, method: 1, module: 1 }, // 1 Chọn trường muốn lấy, -1 bỏ trường khong muốn lấy
+                select: { _id: 1, apiPath: 1, name: 1, method: 1, module: 1 }, 
             })
             .populate({
                 path: 'createdBy',

@@ -57,4 +57,8 @@ export class UpdateArticleDto {
     @IsNotEmpty()
     @IsArray()
     images: string[];
+
+    @IsNotEmpty()
+    @IsArray()
+    attributes: [string];
 }

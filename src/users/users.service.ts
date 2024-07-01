@@ -11,7 +11,7 @@ import {
 import { User as UserModel, UserDocument } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, ObjectId } from 'mongoose';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
@@ -207,8 +207,20 @@ export class UsersService {
             .populate({
                 path: 'role',
                 select: { name: 1 },
-            });
-        return user;
+            })
+            .lean();
+        const userRole = user.role as unknown as { _id: string; name: string };
+        const temp = await this.roleModel
+            .findOne({ name: userRole.name })
+            .populate({
+                path: 'permissions',
+                select: { _id: 1, apiPath: 1, name: 1, method: 1, module: 1 },
+            })
+            .lean();
+        return {
+            ...user,
+            permissions: (await temp).permissions ?? [],
+        };
     }
 
     async findOneByEmail(email: string) {
@@ -289,6 +301,7 @@ export class UsersService {
         return await this.userModel.findByIdAndUpdate(
             { _id: updateUserDto._id },
             updateFields,
+            { new: true },
         );
     }
 
