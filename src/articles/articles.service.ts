@@ -94,6 +94,7 @@ export class ArticlesService {
         const { filter, sort, population, projection } = aqp(qs);
         delete filter.current;
         delete filter.pageSize;
+      
         let offset = (+currentPage - 1) * +limit;
         let defaultLimit = +limit ? +limit : 10;
         const totalItems = (await this.articleModel.find(filter)).length;
