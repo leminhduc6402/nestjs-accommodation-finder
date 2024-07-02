@@ -41,8 +41,8 @@ export class SubcategoriesController {
     }
 
     @Public()
-    @ApiOperation({ summary: 'Fetch SubCategory by category id' })
-    @ResponseMessage('Fetch SubCategory by category id')
+    @ApiOperation({ summary: 'Fetch SubCategory by id' })
+    @ResponseMessage('Fetch SubCategory by id')
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.subcategoriesService.findOne(id);

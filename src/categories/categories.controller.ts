@@ -40,6 +40,7 @@ export class CategoriesController {
         return this.categoriesService.findAll(+currentPage, +limit, qs);
     }
 
+    @Public()
     @ApiOperation({ summary: 'Get a category by id' })
     @ResponseMessage('Get a category by id')
     @Get(':id')
