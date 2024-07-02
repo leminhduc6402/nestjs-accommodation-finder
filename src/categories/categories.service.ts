@@ -91,11 +91,11 @@ export class CategoriesService {
         if (!category) {
             throw new NotFoundException();
         }
-        const { name, subCategories } = updateCategoryDto;
+        const { name, subCategories, active } = updateCategoryDto;
 
         const updated = await this.categoryModel.findByIdAndUpdate(
             { _id },
-            { name, subCategories, updatedBy: user._id },
+            { name, subCategories, active, updatedBy: user._id },
             { new: true },
         );
         return updated;
