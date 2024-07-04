@@ -8,12 +8,15 @@ import { IUser } from 'src/users/users.interface';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
 import { ADMIN } from 'src/databases/sample';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 
 @Injectable()
 export class RolesService {
     constructor(
         @InjectModel(Role.name)
         private roleModel: SoftDeleteModel<RoleDocument>,
+        @InjectModel(User.name)
+        private userModel: SoftDeleteModel<UserDocument>,
     ) {}
 
     async create(createRoleDto: CreateRoleDto, user: IUser) {
@@ -41,7 +44,7 @@ export class RolesService {
 
         delete filter.current;
         delete filter.pageSize;
-        
+
         let offset = (+currentPage - 1) * +limit;
         let defaultLimit = +limit ? +limit : 10;
         const totalItems = (await this.roleModel.find(filter)).length;
@@ -74,7 +77,7 @@ export class RolesService {
             .findById(id)
             .populate({
                 path: 'permissions',
-                select: { _id: 1, apiPath: 1, name: 1, method: 1, module: 1 }, 
+                select: { _id: 1, apiPath: 1, name: 1, method: 1, module: 1 },
             })
             .populate({
                 path: 'createdBy',
@@ -113,7 +116,10 @@ export class RolesService {
         if (foundRole.name === ADMIN) {
             throw new BadRequestException("Can't not remove this role");
         }
-
+        const checkValidUsedRole = await this.userModel.find({ role: id });
+        if (checkValidUsedRole) {
+            throw new BadRequestException('This role is in use');
+        }
         await this.roleModel.updateOne(
             { _id: id },
             {
