@@ -162,11 +162,10 @@ export class UsersService {
             wardName,
         } = createUserDto;
 
-        const isExist = await this.userModel.findOne({ email });
+        const isExist = await this.userModel.findOne({ email, isDeleted: false });
         if (isExist) {
             throw new BadRequestException(`Email: ${email} already exists`);
         }
-
         const default_avatar = this.configService.get<string>('DEFAULT_IMAGE');
 
         const hashPassword = this.hashPassword(password);
