@@ -65,7 +65,7 @@ export class User {
     deletedBy: mongoose.Schema.Types.ObjectId;
 
     @Prop()
-    isDelete: boolean;
+    isDeleted: boolean;
 
     @Prop()
     deletedAt: Date;
