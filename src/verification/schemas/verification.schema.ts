@@ -9,9 +9,6 @@ export type VerificationDocument = HydratedDocument<Verification>;
 @Schema({ timestamps: true })
 export class Verification {
     @Prop()
-    personalIdImage: string[];
-
-    @Prop()
     latedImage: string[];
 
     @Prop()
