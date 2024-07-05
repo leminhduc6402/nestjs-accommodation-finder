@@ -106,11 +106,13 @@ export class VerificationService {
                     user,
                 );
             }
-            return await this.verificationModel.findOneAndUpdate(
-                { _id: id },
-                { status, feedBack },
-                { new: true },
-            );
+            return await this.verificationModel
+                .findOneAndUpdate(
+                    { _id: id },
+                    { status, feedBack },
+                    { new: true },
+                )
+                .populate({ path: 'createdBy' });
         }
         throw new BadRequestException();
     }
